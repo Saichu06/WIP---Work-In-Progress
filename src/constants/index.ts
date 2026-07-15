@@ -240,7 +240,12 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 ];
 
 export const ROUTES = {
-  DASHBOARD: '/',
+  LANDING: '/',
+  LOGIN: '/login',
+  SIGNUP: '/signup',
+  FORGOT_PASSWORD: '/forgot-password',
+  HOME: '/home',
+  DASHBOARD: '/home', // alias kept for backward compat
   PROJECTS: '/projects',
   SEARCH: '/search',
   NOTIFICATIONS: '/notifications',
@@ -258,3 +263,4 @@ export const ROUTES = {
   PROJECT_ANALYTICS: (id: string) => `/projects/${id}/analytics`,
   PROJECT_SETTINGS: (id: string) => `/projects/${id}/settings`,
 };
+
