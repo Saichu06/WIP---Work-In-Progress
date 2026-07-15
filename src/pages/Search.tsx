@@ -76,84 +76,70 @@ export function SearchPage() {
   });
 
   return (
-    <div className="p-8 max-w-3xl mx-auto animate-in">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Universal Search</h1>
-          <p className="page-subtitle">Search across all projects, tasks, docs, snippets, and more.</p>
-        </div>
-      </div>
-
-      <div className="relative mb-6">
-        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-content-muted" />
-        <input
-          className="input pl-11 h-13 text-base"
-          style={{ height: '52px' }}
-          placeholder="Search everything..."
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          autoFocus
-        />
-        {query && (
-          <button onClick={() => setQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-content-muted hover:text-content-primary text-xs">Clear</button>
-        )}
-      </div>
-
-      {results.length > 0 && (
-        <div className="flex gap-2 mb-6 flex-wrap">
-          {types.map(t => {
-            const count = t === 'all' ? results.length : results.filter(r => r.type === t).length;
-            if (count === 0 && t !== 'all') return null;
-            return (
-              <button key={t} onClick={() => setActiveType(t)} className={cn('px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize', activeType === t ? 'bg-content-primary text-white' : 'bg-surface-secondary text-content-muted hover:text-content-primary border border-surface-border')}>
-                {t} {count > 0 && <span className="ml-1 opacity-60">{count}</span>}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {!query && (
-        <div className="text-center py-20">
-          <div className="w-16 h-16 bg-surface-secondary rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">🔍</div>
-          <h3 className="text-sm font-semibold text-content-primary mb-1">Search Everything</h3>
-          <p className="text-sm text-content-secondary">Type at least 2 characters to search across your entire workspace.</p>
-          <p className="text-xs text-content-muted mt-2">Pro tip: Use <kbd className="bg-surface-secondary border border-surface-border rounded px-1.5 py-0.5">Ctrl+K</kbd> to open the command palette from anywhere.</p>
-        </div>
-      )}
-
-      {query && query.length < 2 && (
-        <p className="text-center text-sm text-content-muted py-12">Keep typing…</p>
-      )}
-
-      {query.length >= 2 && results.length === 0 && (
-        <div className="text-center py-20">
-          <div className="text-2xl mb-3">🤔</div>
-          <h3 className="text-sm font-semibold text-content-primary mb-1">No results for "{query}"</h3>
-          <p className="text-sm text-content-secondary">Try different keywords or check your spelling.</p>
-        </div>
-      )}
-
-      {Object.entries(grouped).map(([type, items]) => (
-        <div key={type} className="mb-6">
-          <h2 className="text-xs font-semibold text-content-muted uppercase tracking-wider mb-2 capitalize">{type}s</h2>
-          <div className="space-y-1">
-            {items.map(result => (
-              <Link key={result.id} to={result.url} className="flex items-center gap-3 p-3 rounded-xl bg-white border border-surface-border hover:shadow-sm transition-all group">
-                <div className="w-8 h-8 rounded-lg bg-surface-secondary flex items-center justify-center text-content-muted flex-shrink-0">
-                  {ICONS[result.type]}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-content-primary truncate">{result.title}</div>
-                  {result.subtitle && <div className="text-xs text-content-muted truncate mt-0.5">{result.subtitle}</div>}
-                  {result.projectName && <div className="text-xs text-content-muted mt-0.5">in {result.projectName}</div>}
-                </div>
-                <ArrowRight size={13} className="text-content-muted opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Link>
-            ))}
+    <div className="flex-1 overflow-y-auto p-8 w-full animate-in">
+      <div className="max-w-3xl mx-auto">
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">Universal Search</h1>
+            <p className="page-subtitle">Search across all projects, tasks, docs, snippets, and more.</p>
           </div>
         </div>
-      ))}
+
+        <div className="relative mb-6">
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-content-muted" />
+          <input
+            className="input pl-11 h-13 text-base"
+            placeholder="Search everything..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            autoFocus
+          />
+        </div>
+
+        {query.length >= 2 && (
+          <div className="flex gap-1 overflow-x-auto mb-6">
+            {types.map(t => (
+              <button
+                key={t}
+                onClick={() => setActiveType(t)}
+                className={cn('px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize whitespace-nowrap', activeType === t ? 'bg-content-primary text-white' : 'bg-surface-secondary text-content-muted hover:text-content-primary border border-surface-border')}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {query.length < 2 ? (
+          <div className="text-center py-20">
+            <Search size={32} className="mx-auto text-content-muted mb-3 opacity-30" />
+            <p className="text-sm text-content-secondary">Type at least 2 characters to search across your workspace.</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-sm text-content-muted">No results found for "{query}".</p>
+          </div>
+        ) : Object.entries(grouped).map(([type, items]) => (
+          <div key={type} className="mb-6">
+            <p className="text-xs font-semibold text-content-muted uppercase tracking-wider mb-2 capitalize">{type}s</p>
+            <div className="space-y-1">
+              {items.map(result => (
+                <Link key={result.id} to={result.url} className="flex items-center gap-3 p-3 rounded-xl bg-white border border-surface-border hover:shadow-sm transition-all group">
+                  <div className="w-8 h-8 rounded-lg bg-surface-secondary flex items-center justify-center text-content-muted flex-shrink-0">
+                    {ICONS[result.type]}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-content-primary truncate">{result.title}</div>
+                    {result.subtitle && <div className="text-xs text-content-muted truncate mt-0.5">{result.subtitle}</div>}
+                    {result.projectName && <div className="text-xs text-content-muted mt-0.5">in {result.projectName}</div>}
+                  </div>
+                  <ArrowRight size={13} className="text-content-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

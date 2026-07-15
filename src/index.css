@@ -28,8 +28,10 @@
 }
 
 @layer base {
-  * { box-sizing: border-box; }
-  
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     @apply bg-surface-primary text-content-primary font-sans antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
@@ -40,10 +42,23 @@
     color: #111827;
   }
 
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 99px; }
-  ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #E5E7EB;
+    border-radius: 99px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #D1D5DB;
+  }
 }
 
 @layer components {
@@ -68,40 +83,31 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-4 h-11 rounded-xl bg-content-primary text-white text-sm font-medium
-           transition-all duration-150 hover:bg-gray-800 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center gap-2 px-4 h-11 rounded-xl bg-content-primary text-white text-sm font-medium transition-all duration-150 hover:bg-gray-800 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center gap-2 px-4 h-11 rounded-xl bg-surface-secondary border border-surface-border 
-           text-content-primary text-sm font-medium transition-all duration-150 hover:bg-gray-100 active:scale-[0.98];
+    @apply inline-flex items-center gap-2 px-4 h-11 rounded-xl bg-surface-secondary border border-surface-border text-content-primary text-sm font-medium transition-all duration-150 hover:bg-gray-100 active:scale-[0.98];
   }
 
   .btn-ghost {
-    @apply inline-flex items-center gap-2 px-3 h-9 rounded-lg text-content-secondary text-sm font-medium
-           transition-all duration-150 hover:bg-surface-secondary hover:text-content-primary;
+    @apply inline-flex items-center gap-2 px-3 h-9 rounded-lg text-content-secondary text-sm font-medium transition-all duration-150 hover:bg-surface-secondary hover:text-content-primary;
   }
 
   .btn-danger {
-    @apply inline-flex items-center gap-2 px-4 h-11 rounded-xl bg-red-50 border border-red-200
-           text-red-600 text-sm font-medium transition-all duration-150 hover:bg-red-100;
+    @apply inline-flex items-center gap-2 px-4 h-11 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium transition-all duration-150 hover:bg-red-100;
   }
 
   .btn-yellow {
-    @apply inline-flex items-center gap-2 px-4 h-11 rounded-xl bg-brand-yellow border border-brand-yellow-dark
-           text-content-primary text-sm font-semibold transition-all duration-150 hover:bg-yellow-300 active:scale-[0.98];
+    @apply inline-flex items-center gap-2 px-4 h-11 rounded-xl bg-brand-yellow border border-brand-yellow-dark text-content-primary text-sm font-semibold transition-all duration-150 hover:bg-yellow-300 active:scale-[0.98];
   }
 
   .input {
-    @apply w-full h-11 px-3 rounded-xl border border-surface-border bg-white text-sm text-content-primary
-           placeholder:text-content-muted focus:outline-none focus:ring-2 focus:ring-content-primary/10 
-           focus:border-content-primary transition-all duration-150;
+    @apply w-full h-11 px-3 rounded-xl border border-surface-border bg-white text-sm text-content-primary placeholder:text-content-muted focus:outline-none focus:ring-2 focus:ring-content-primary/10 focus:border-content-primary transition-all duration-150;
   }
 
   .textarea {
-    @apply w-full px-3 py-2.5 rounded-xl border border-surface-border bg-white text-sm text-content-primary
-           placeholder:text-content-muted focus:outline-none focus:ring-2 focus:ring-content-primary/10
-           focus:border-content-primary transition-all duration-150 resize-none;
+    @apply w-full px-3 py-2.5 rounded-xl border border-surface-border bg-white text-sm text-content-primary placeholder:text-content-muted focus:outline-none focus:ring-2 focus:ring-content-primary/10 focus:border-content-primary transition-all duration-150 resize-none;
   }
 
   .label {
@@ -113,8 +119,7 @@
   }
 
   .sidebar-link {
-    @apply flex items-center gap-3 px-3 h-9 rounded-lg text-sm text-content-secondary font-medium
-           transition-all duration-150 hover:bg-surface-secondary hover:text-content-primary cursor-pointer;
+    @apply flex items-center gap-3 px-3 h-9 rounded-lg text-sm text-content-secondary font-medium transition-all duration-150 hover:bg-surface-secondary hover:text-content-primary cursor-pointer;
   }
 
   .sidebar-link-active {
@@ -122,8 +127,7 @@
   }
 
   .tab-link {
-    @apply px-3 py-2 text-sm font-medium text-content-secondary border-b-2 border-transparent
-           transition-all duration-150 hover:text-content-primary hover:border-gray-300 whitespace-nowrap;
+    @apply px-3 py-2 text-sm font-medium text-content-secondary border-b-2 border-transparent transition-all duration-150 hover:text-content-primary hover:border-gray-300 whitespace-nowrap;
   }
 
   .tab-link-active {
@@ -134,36 +138,115 @@
     @apply flex flex-col items-center justify-center py-20 text-center;
   }
 
-  .priority-critical { @apply text-red-600 bg-red-50; }
-  .priority-high { @apply text-brand-red bg-red-50; }
-  .priority-medium { @apply text-amber-600 bg-amber-50; }
-  .priority-low { @apply text-emerald-600 bg-emerald-50; }
+  .priority-critical {
+    @apply text-red-600 bg-red-50;
+  }
 
-  .status-backlog { @apply text-gray-600 bg-gray-100; }
-  .status-todo { @apply text-blue-600 bg-blue-50; }
-  .status-in-progress { @apply text-amber-600 bg-amber-50; }
-  .status-review { @apply text-purple-600 bg-purple-50; }
-  .status-testing { @apply text-sky-600 bg-sky-50; }
-  .status-done { @apply text-emerald-600 bg-emerald-50; }
+  .priority-high {
+    @apply text-brand-red bg-red-50;
+  }
+
+  .priority-medium {
+    @apply text-amber-600 bg-amber-50;
+  }
+
+  .priority-low {
+    @apply text-emerald-600 bg-emerald-50;
+  }
+
+  .status-backlog {
+    @apply text-gray-600 bg-gray-100;
+  }
+
+  .status-todo {
+    @apply text-blue-600 bg-blue-50;
+  }
+
+  .status-in-progress {
+    @apply text-amber-600 bg-amber-50;
+  }
+
+  .status-review {
+    @apply text-purple-600 bg-purple-50;
+  }
+
+  .status-testing {
+    @apply text-sky-600 bg-sky-50;
+  }
+
+  .status-done {
+    @apply text-emerald-600 bg-emerald-50;
+  }
 }
 
 /* Animations */
-.animate-in { animation: fade-in 0.2s ease-out both; }
+.animate-in {
+  animation: fade-in 0.2s ease-out both;
+}
 
 /* Prose styles for markdown editor */
 .prose-wip {
   @apply text-sm text-content-primary leading-relaxed;
 }
-.prose-wip h1 { @apply text-xl font-bold mb-3 mt-5; }
-.prose-wip h2 { @apply text-lg font-semibold mb-2 mt-4; }
-.prose-wip h3 { @apply text-base font-semibold mb-2 mt-3; }
-.prose-wip p { @apply mb-3; }
-.prose-wip ul { @apply list-disc list-inside mb-3 space-y-1; }
-.prose-wip ol { @apply list-decimal list-inside mb-3 space-y-1; }
-.prose-wip code { @apply bg-surface-secondary px-1.5 py-0.5 rounded text-xs font-mono; }
-.prose-wip pre { @apply bg-gray-900 text-gray-100 p-4 rounded-xl mb-3 overflow-x-auto; }
-.prose-wip pre code { @apply bg-transparent p-0 text-gray-100; }
-.prose-wip blockquote { @apply border-l-4 border-brand-yellow pl-4 italic text-content-secondary mb-3; }
-.prose-wip strong { @apply font-semibold; }
-.prose-wip a { @apply text-blue-600 underline; }
-.prose-wip hr { @apply border-surface-border my-4; }
+
+.prose-wip h1 {
+  @apply text-xl font-bold mb-3 mt-5;
+}
+
+.prose-wip h2 {
+  @apply text-lg font-semibold mb-2 mt-4;
+}
+
+.prose-wip h3 {
+  @apply text-base font-semibold mb-2 mt-3;
+}
+
+.prose-wip p {
+  @apply mb-3;
+}
+
+.prose-wip ul {
+  @apply list-disc list-inside mb-3 space-y-1;
+}
+
+.prose-wip ol {
+  @apply list-decimal list-inside mb-3 space-y-1;
+}
+
+.prose-wip code {
+  @apply bg-surface-secondary px-1.5 py-0.5 rounded text-xs font-mono;
+}
+
+.prose-wip pre {
+  @apply bg-gray-900 text-gray-100 p-4 rounded-xl mb-3 overflow-x-auto;
+}
+
+.prose-wip pre code {
+  @apply bg-transparent p-0 text-gray-100;
+}
+
+.prose-wip blockquote {
+  @apply border-l-4 border-brand-yellow pl-4 italic text-content-secondary mb-3;
+}
+
+.prose-wip strong {
+  @apply font-semibold;
+}
+
+.prose-wip a {
+  @apply text-blue-600 underline;
+}
+
+.prose-wip hr {
+  @apply border-surface-border my-4;
+}
+
+/* Professional Grayscale Emojis */
+/* Professional Grayscale Emojis */
+.prof-emoji,
+.emoji,
+[role="img"] {
+  filter: grayscale(100%) contrast(120%) brightness(95%);
+  display: inline-block;
+  opacity: 0.95;
+}

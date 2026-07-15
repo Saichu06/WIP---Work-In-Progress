@@ -3,15 +3,16 @@ import { useState, useEffect } from 'react';
 import {
   LayoutDashboard, Map, List, Zap, Layout, GitBranch,
   FileText, Image, Code2, BarChart2, Settings, ChevronRight,
-  Star, MoreHorizontal, Archive, Copy, Trash2
+  Star, MoreHorizontal, Archive, Copy, Trash2, Edit3, Share2
 } from 'lucide-react';
 import { ProjectStorage } from '@/storage/ProjectStorage';
 import { ActivityStorage } from '@/storage/ActivityStorage';
 import { useApp } from '@/contexts/AppContext';
 import { ROUTES } from '@/constants';
-import { cn } from '@/utils';
+import { cn, formatRelative } from '@/utils';
 import type { Project } from '@/types';
 import { ProjectDialog } from '@/components/projects/ProjectDialog';
+import { SaveBlueprintDialog } from '@/components/projects/SaveBlueprintDialog';
 
 const tabs = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -34,6 +35,7 @@ export function ProjectLayout() {
   const [project, setProject] = useState<Project | undefined>();
   const [editOpen, setEditOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [blueprintOpen, setBlueprintOpen] = useState(false);
 
   useEffect(() => {
     if (id) setProject(ProjectStorage.getById(id));
@@ -78,58 +80,110 @@ export function ProjectLayout() {
   };
 
   return (
-    <div className="flex flex-col h-full min-h-screen">
+    <div className="flex flex-col h-screen overflow-hidden">
       {/* Project Header */}
       <div className="bg-white border-b border-surface-border flex-shrink-0">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 px-6 pt-4 text-xs text-content-muted">
-          <span>Projects</span>
-          <ChevronRight size={12} />
-          <span className="text-content-primary font-medium">{project.name}</span>
+        {/* Breadcrumb & Last Updated */}
+        <div className="flex items-center justify-between px-6 pt-3 text-[11px] text-content-muted">
+          <div className="flex items-center gap-1">
+            <span className="hover:text-content-primary cursor-pointer" onClick={() => navigate(ROUTES.PROJECTS)}>Projects</span>
+            <ChevronRight size={10} />
+            <span className="text-content-primary font-medium">{project.name}</span>
+          </div>
+          <span className="font-mono">
+            Updated {formatRelative(project.updatedAt)}
+          </span>
         </div>
 
         {/* Project title row */}
-        <div className="flex items-center justify-between px-6 pt-2 pb-0">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: project.color + '33' }}>
+        <div className="flex items-center justify-between px-6 py-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 shadow-sm"
+              style={{ backgroundColor: `${project.color}20`, border: `1px solid ${project.color}33` }}
+            >
               {project.icon}
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-content-primary">{project.name}</h1>
-              {project.description && <p className="text-xs text-content-muted">{project.description}</p>}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="text-base font-bold text-content-primary truncate">{project.name}</h1>
+                <span className={cn(
+                  'badge text-[10px] font-semibold py-0.5 px-2 rounded-full uppercase tracking-wider',
+                  project.status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                  project.status === 'completed' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
+                  project.status === 'on-hold' ? 'bg-amber-50 text-amber-700 border border-amber-100' :
+                  'bg-gray-100 text-gray-600 border border-gray-200'
+                )}>
+                  {project.status}
+                </span>
+                <button
+                  onClick={handleFavorite}
+                  className="text-content-muted hover:text-amber-500 transition-colors p-1"
+                  title={project.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                >
+                  <Star size={14} fill={project.isFavorite ? '#F59E0B' : 'none'} className={project.isFavorite ? 'text-amber-500' : ''} />
+                </button>
+              </div>
+              {project.description && (
+                <p className="text-xs text-content-secondary truncate mt-0.5 max-w-xl">
+                  {project.description}
+                </p>
+              )}
             </div>
-            <span className={cn('badge text-xs ml-2',
-              project.status === 'active' ? 'bg-emerald-50 text-emerald-600' :
-              project.status === 'archived' ? 'bg-gray-100 text-gray-500' :
-              'bg-amber-50 text-amber-600'
-            )}>
-              {project.status}
-            </span>
           </div>
 
-          <div className="flex items-center gap-1 relative">
-            <button onClick={handleFavorite} className="btn-ghost p-2" title={project.isFavorite ? 'Unfavorite' : 'Favorite'}>
-              <Star size={15} fill={project.isFavorite ? '#F59E0B' : 'none'} className={project.isFavorite ? 'text-amber-500' : ''} />
+          {/* Quick Actions & Menu */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => setBlueprintOpen(true)}
+              className="btn-secondary h-8 px-2.5 text-xs font-semibold flex items-center gap-1.5"
+              title="Save project structure as a reusable blueprint"
+            >
+              <Share2 size={12} />
+              <span className="hidden sm:inline">Save as Blueprint</span>
             </button>
+
+            <button
+              onClick={() => setEditOpen(true)}
+              className="btn-secondary h-8 px-2.5 text-xs font-semibold flex items-center gap-1.5"
+            >
+              <Edit3 size={12} />
+              <span className="hidden sm:inline">Edit Details</span>
+            </button>
+
             <div className="relative">
-              <button onClick={() => setMenuOpen(!menuOpen)} className="btn-ghost p-2">
-                <MoreHorizontal size={15} />
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="btn-secondary h-8 w-8 p-0 flex items-center justify-center"
+              >
+                <MoreHorizontal size={14} />
               </button>
               {menuOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-                  <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl border border-surface-border shadow-lg z-20 py-1 animate-scale-in">
-                    <button onClick={() => { setEditOpen(true); setMenuOpen(false); }} className="flex items-center gap-2 w-full px-3 py-2 text-sm text-content-primary hover:bg-surface-secondary">
-                      <Settings size={13} /> Edit Project
+                  <div className="absolute right-0 top-full mt-1.5 w-44 bg-white rounded-xl border border-surface-border shadow-lg z-20 py-1 animate-scale-in">
+                    <button
+                      onClick={handleDuplicate}
+                      className="flex items-center gap-2 w-full px-3 py-2 text-xs text-content-primary hover:bg-surface-secondary"
+                    >
+                      <Copy size={13} /> Duplicate Project
                     </button>
-                    <button onClick={handleDuplicate} className="flex items-center gap-2 w-full px-3 py-2 text-sm text-content-primary hover:bg-surface-secondary">
-                      <Copy size={13} /> Duplicate
-                    </button>
-                    <button onClick={() => { ProjectStorage.update(id, { status: project.status === 'archived' ? 'active' : 'archived' }); setProject(ProjectStorage.getById(id)); refreshProjects(); setMenuOpen(false); }} className="flex items-center gap-2 w-full px-3 py-2 text-sm text-content-primary hover:bg-surface-secondary">
+                    <button
+                      onClick={() => {
+                        ProjectStorage.update(id, { status: project.status === 'archived' ? 'active' : 'archived' });
+                        setProject(ProjectStorage.getById(id));
+                        refreshProjects();
+                        setMenuOpen(false);
+                      }}
+                      className="flex items-center gap-2 w-full px-3 py-2 text-xs text-content-primary hover:bg-surface-secondary"
+                    >
                       <Archive size={13} /> {project.status === 'archived' ? 'Unarchive' : 'Archive'}
                     </button>
                     <div className="h-px bg-surface-border my-1" />
-                    <button onClick={handleDelete} className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50">
+                    <button
+                      onClick={handleDelete}
+                      className="flex items-center gap-2 w-full px-3 py-2 text-xs text-red-600 hover:bg-red-50"
+                    >
                       <Trash2 size={13} /> Delete Project
                     </button>
                   </div>
@@ -140,7 +194,7 @@ export function ProjectLayout() {
         </div>
 
         {/* Tab Nav */}
-        <div className="flex gap-0 px-6 mt-3 overflow-x-auto">
+        <div className="flex gap-1 px-6 border-t border-surface-border overflow-x-auto scrollbar-none">
           {tabs.map(tab => (
             <NavLink
               key={tab.id}
@@ -148,7 +202,10 @@ export function ProjectLayout() {
                 ? (ROUTES[`PROJECT_${tab.id.toUpperCase()}` as keyof typeof ROUTES] as (id: string) => string)(id)
                 : `${id}/${tab.id}`
               }
-              className={({ isActive }) => cn('tab-link flex items-center gap-1.5', isActive && 'tab-link-active')}
+              className={({ isActive }) => cn(
+                'flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold border-b-2 border-transparent text-content-secondary hover:text-content-primary transition-all whitespace-nowrap',
+                isActive && 'border-content-primary text-content-primary font-bold'
+              )}
             >
               <tab.icon size={13} />
               {tab.label}
@@ -158,7 +215,7 @@ export function ProjectLayout() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto bg-surface-primary">
+      <div className="flex-1 min-h-0 flex flex-col bg-surface-primary overflow-hidden">
         <Outlet context={{ project, setProject }} />
       </div>
 
@@ -168,6 +225,14 @@ export function ProjectLayout() {
         onClose={() => setEditOpen(false)}
         onSave={() => { setProject(ProjectStorage.getById(id)); refreshProjects(); setEditOpen(false); }}
       />
+
+      {blueprintOpen && (
+        <SaveBlueprintDialog
+          projectId={project.id}
+          projectName={project.name}
+          onClose={() => setBlueprintOpen(false)}
+        />
+      )}
     </div>
   );
 }

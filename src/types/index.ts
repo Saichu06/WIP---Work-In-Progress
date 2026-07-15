@@ -46,10 +46,61 @@ export interface Sprint {
   updatedAt: string;
 }
 
+export interface ChecklistItem {
+  id: string;
+  title: string;
+  completed: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Subtask {
+  id: string;
+  title: string;
+  status: TaskStatus;
+  priority: Priority;
+  dueDate?: string;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskAttachment {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  dataUrl: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskActivityLog {
+  id: string;
+  type: string;
+  message: string;
+  createdAt: string;
+}
+
+export interface TaskComment {
+  id: string;
+  author: string;
+  message: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskDependency {
+  taskId: string;
+  relationship: 'blocks' | 'blocked-by' | 'related' | 'duplicate' | 'parent' | 'child';
+}
+
 export interface Task {
   id: string;
   projectId: string;
   sprintId?: string;
+  taskId: string; // e.g., WIP-001
+  position: number;
   title: string;
   description: string;
   status: TaskStatus;
@@ -57,19 +108,26 @@ export interface Task {
   labels: string[];
   storyPoints: number;
   acceptanceCriteria: string;
-  comments: Comment[];
+  comments: TaskComment[];
   assignee: string;
   isFavorite: boolean;
+  dueDate?: string;
+  archivedAt?: string; // null means active
+  estimatedTime?: number;
+  actualTime?: number;
+  epicId?: string;
+  storyId?: string;
+  version: number;
+  watchers: string[];
+  checklist: ChecklistItem[];
+  subtasks: Subtask[];
+  attachments: TaskAttachment[];
+  activities: TaskActivityLog[];
+  dependencies: TaskDependency[];
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Comment {
-  id: string;
-  author: string;
-  content: string;
-  createdAt: string;
-}
 
 export interface Document {
   id: string;
@@ -139,6 +197,22 @@ export interface WorkspaceSettings {
   exportedAt?: string;
 }
 
+export interface BoardPreferences {
+  compact: boolean;
+  showLabels: boolean;
+  showStoryPoints: boolean;
+  showDueDates: boolean;
+  showChecklist: boolean;
+  cardSize: 'sm' | 'md' | 'lg';
+}
+
+export interface UndoAction {
+  id: string;
+  type: 'archive' | 'delete' | 'restore' | 'move' | 'duplicate';
+  payload: any;
+  expiresAt: string;
+}
+
 export interface ProjectTemplate {
   id: string;
   name: string;
@@ -150,7 +224,7 @@ export interface ProjectTemplate {
   sprintNames: string[];
   labels: string[];
   defaultDocs: { title: string; content: string }[];
-  sampleTasks: Omit<Task, 'id' | 'projectId' | 'sprintId' | 'createdAt' | 'updatedAt' | 'comments'>[];
+  sampleTasks: Omit<Task, 'id' | 'projectId' | 'sprintId' | 'createdAt' | 'updatedAt' | 'comments' | 'taskId' | 'position' | 'version' | 'watchers' | 'checklist' | 'subtasks' | 'attachments' | 'activities' | 'dependencies'>[];
 }
 
 export interface SearchResult {
@@ -161,4 +235,25 @@ export interface SearchResult {
   projectId?: string;
   projectName?: string;
   url: string;
+}
+
+export type BlueprintCategory =
+  | 'Development'
+  | 'AI & ML'
+  | 'Startup'
+  | 'Enterprise'
+  | 'Design'
+  | 'Education'
+  | 'Personal'
+  | 'Open Source'
+  | 'Custom';
+
+export interface Blueprint extends ProjectTemplate {
+  category: BlueprintCategory;
+  setupTime: string;    // e.g. "~5 min"
+  audience: string;     // e.g. "Solo devs, small teams"
+  features: string[];   // Feature bullets shown in preview
+  defaultSnippets?: { title: string; language: string; code: string; description: string; tags: string[] }[];
+  isCustom?: boolean;
+  createdAt?: string;
 }

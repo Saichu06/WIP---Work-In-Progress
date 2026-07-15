@@ -1,16 +1,19 @@
 import { useState } from 'react';
-import { X, Check, Sparkles } from 'lucide-react';
+import { X } from 'lucide-react';
 import { ProjectStorage } from '@/storage/ProjectStorage';
 import { PlanningStorage } from '@/storage/PlanningStorage';
 import { SprintStorage } from '@/storage/SprintStorage';
 import { TaskStorage } from '@/storage/TaskStorage';
 import { DocumentStorage } from '@/storage/DocumentStorage';
+import { SnippetStorage } from '@/storage/SnippetStorage';
 import { ActivityStorage } from '@/storage/ActivityStorage';
-import { PROJECT_COLORS, PROJECT_ICONS, PROJECT_TEMPLATES } from '@/constants';
+import { PROJECT_COLORS, PROJECT_ICONS } from '@/constants';
+import { OFFICIAL_BLUEPRINTS } from '@/constants/blueprints';
 import { cn } from '@/utils';
-import type { Project } from '@/types';
+import type { Project, Blueprint, SnippetLanguage } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { addDays, format } from 'date-fns';
+import { BlueprintSelector } from './BlueprintSelector';
 
 interface ProjectDialogProps {
   open: boolean;
@@ -19,12 +22,12 @@ interface ProjectDialogProps {
   onSave: () => void;
 }
 
-type Step = 'details' | 'template';
+type Step = 'blueprint' | 'details';
 
 export function ProjectDialog({ open, project, onClose, onSave }: ProjectDialogProps) {
   const isEdit = !!project;
-  const [step, setStep] = useState<Step>(isEdit ? 'details' : 'template');
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('blank');
+  const [step, setStep] = useState<Step>(isEdit ? 'details' : 'blueprint');
+  const [selectedBlueprint, setSelectedBlueprint] = useState<Blueprint>(OFFICIAL_BLUEPRINTS.find(b => b.id === 'blank')!);
   const [name, setName] = useState(project?.name || '');
   const [description, setDescription] = useState(project?.description || '');
   const [color, setColor] = useState(project?.color || PROJECT_COLORS[0]);
@@ -39,60 +42,82 @@ export function ProjectDialog({ open, project, onClose, onSave }: ProjectDialogP
 
     if (isEdit) {
       ProjectStorage.update(project.id, { name, description, color, icon });
-      ActivityStorage.log('project_updated', `Project updated`, `"${name}" was updated`);
+      ActivityStorage.log('project_updated', 'Project updated', `"${name}" was updated`);
     } else {
       const newProject = ProjectStorage.create({
-        name, description, color, icon, status: 'active', progress: 0, isFavorite: false,
+        name,
+        description,
+        color: selectedBlueprint.color !== '#9CA3AF' ? selectedBlueprint.color : color,
+        icon: selectedBlueprint.icon !== '✨' ? selectedBlueprint.icon : icon,
+        status: 'active',
+        progress: 0,
+        isFavorite: false,
       });
 
-      ActivityStorage.log('project_created', `Project created`, `"${name}" was created`, newProject.id);
+      ActivityStorage.log('project_created', 'Project created', `"${name}" was created`, newProject.id);
 
-      const template = PROJECT_TEMPLATES.find(t => t.id === selectedTemplate);
-      if (template) {
-        // Create planning sections
-        PlanningStorage.initForProject(newProject.id, template.planningItems);
+      const bp = selectedBlueprint;
 
-        // Create sprints
-        const sprints = template.sprintNames.map((sprintName, i) => {
-          const start = addDays(new Date(), i * 14);
-          return SprintStorage.create({
-            projectId: newProject.id,
-            name: sprintName,
-            goal: '',
-            notes: '',
-            status: i === 0 ? 'planning' : 'planning',
-            capacity: 40,
-            startDate: format(start, 'yyyy-MM-dd'),
-            endDate: format(addDays(start, 13), 'yyyy-MM-dd'),
-          });
-        });
-
-        // Create tasks
-        const firstSprint = sprints[0];
-        template.sampleTasks.forEach(task => {
-          TaskStorage.create({
-            ...task,
-            projectId: newProject.id,
-            sprintId: firstSprint?.id,
-          });
-        });
-
-        // Create docs
-        template.defaultDocs.forEach(doc => {
-          DocumentStorage.create({
-            projectId: newProject.id,
-            type: 'document',
-            title: doc.title,
-            content: doc.content,
-            isPinned: false,
-            isFavorite: false,
-          });
-        });
-
-        ActivityStorage.log('sprint_created', `Sprints created from template`, `${template.sprintNames.length} sprints created`, newProject.id);
+      // Init planning
+      if (bp.planningItems && bp.planningItems.length > 0) {
+        PlanningStorage.initForProject(newProject.id, bp.planningItems);
       } else {
-        // blank — just init default planning sections
         PlanningStorage.initForProject(newProject.id);
+      }
+
+      // Create sprints
+      const sprints = (bp.sprintNames || []).map((sprintName, i) => {
+        const start = addDays(new Date(), i * 14);
+        return SprintStorage.create({
+          projectId: newProject.id,
+          name: sprintName,
+          goal: '',
+          notes: '',
+          status: 'planning',
+          capacity: 40,
+          startDate: format(start, 'yyyy-MM-dd'),
+          endDate: format(addDays(start, 13), 'yyyy-MM-dd'),
+        });
+      });
+
+      // Create tasks
+      const firstSprint = sprints[0];
+      (bp.sampleTasks || []).forEach(task => {
+        TaskStorage.create({
+          ...task,
+          projectId: newProject.id,
+          sprintId: firstSprint?.id,
+        });
+      });
+
+      // Create docs
+      (bp.defaultDocs || []).forEach(doc => {
+        DocumentStorage.create({
+          projectId: newProject.id,
+          type: 'document',
+          title: doc.title,
+          content: doc.content,
+          isPinned: false,
+          isFavorite: false,
+        });
+      });
+
+      // Create snippets
+      (bp.defaultSnippets || []).forEach(snippet => {
+        SnippetStorage.create({
+          projectId: newProject.id,
+          title: snippet.title,
+          description: snippet.description || '',
+          language: snippet.language as SnippetLanguage,
+          code: snippet.code,
+          tags: snippet.tags || [],
+          isFavorite: false,
+          category: bp.category,
+        });
+      });
+
+      if (sprints.length > 0) {
+        ActivityStorage.log('sprint_created', 'Sprints created from blueprint', `${sprints.length} sprints created`, newProject.id);
       }
     }
 
@@ -102,8 +127,8 @@ export function ProjectDialog({ open, project, onClose, onSave }: ProjectDialogP
   };
 
   const handleClose = () => {
-    setStep('template');
-    setSelectedTemplate('blank');
+    setStep('blueprint');
+    setSelectedBlueprint(OFFICIAL_BLUEPRINTS.find(b => b.id === 'blank')!);
     setName('');
     setDescription('');
     setColor(PROJECT_COLORS[0]);
@@ -111,18 +136,24 @@ export function ProjectDialog({ open, project, onClose, onSave }: ProjectDialogP
     onClose();
   };
 
+  const dialogWidth = step === 'blueprint' && !isEdit ? 'max-w-5xl' : 'max-w-lg';
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={handleClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl border border-surface-border w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden animate-scale-in flex flex-col">
+      <div className={cn(
+        'relative bg-white rounded-2xl shadow-2xl border border-surface-border w-full mx-4 animate-scale-in flex flex-col',
+        dialogWidth,
+        step === 'blueprint' && !isEdit ? 'h-[85vh]' : 'max-h-[90vh]'
+      )}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border flex-shrink-0">
           <div>
             <h2 className="text-base font-semibold text-content-primary">
-              {isEdit ? 'Edit Project' : (step === 'template' ? 'Choose a Template' : 'Project Details')}
+              {isEdit ? 'Edit Project' : (step === 'blueprint' ? '✨ Blueprint Store' : 'Project Details')}
             </h2>
             <p className="text-xs text-content-muted mt-0.5">
-              {isEdit ? 'Update project information' : (step === 'template' ? 'Start fast with a pre-built workspace' : 'Name and configure your project')}
+              {isEdit ? 'Update project information' : (step === 'blueprint' ? 'Choose a pre-built workspace to start fast' : `Using: ${selectedBlueprint.icon} ${selectedBlueprint.name}`)}
             </p>
           </div>
           <button onClick={handleClose} className="btn-ghost p-2 rounded-lg">
@@ -130,55 +161,19 @@ export function ProjectDialog({ open, project, onClose, onSave }: ProjectDialogP
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
-          {/* Template Selection Step */}
-          {step === 'template' && !isEdit && (
-            <div className="p-6">
-              <div className="grid grid-cols-2 gap-3">
-                {/* Blank */}
-                <button
-                  onClick={() => setSelectedTemplate('blank')}
-                  className={cn(
-                    'text-left p-4 rounded-xl border-2 transition-all duration-150',
-                    selectedTemplate === 'blank'
-                      ? 'border-content-primary bg-surface-secondary'
-                      : 'border-surface-border hover:border-gray-300'
-                  )}
-                >
-                  <div className="text-2xl mb-2">✨</div>
-                  <div className="font-semibold text-sm text-content-primary">Blank Project</div>
-                  <div className="text-xs text-content-muted mt-1">Start with an empty workspace</div>
-                  {selectedTemplate === 'blank' && <Check size={14} className="text-content-primary mt-2" />}
-                </button>
-
-                {PROJECT_TEMPLATES.map(tmpl => (
-                  <button
-                    key={tmpl.id}
-                    onClick={() => setSelectedTemplate(tmpl.id)}
-                    className={cn(
-                      'text-left p-4 rounded-xl border-2 transition-all duration-150',
-                      selectedTemplate === tmpl.id
-                        ? 'border-content-primary bg-surface-secondary'
-                        : 'border-surface-border hover:border-gray-300'
-                    )}
-                  >
-                    <div className="text-2xl mb-2">{tmpl.icon}</div>
-                    <div className="font-semibold text-sm text-content-primary">{tmpl.name}</div>
-                    <div className="text-xs text-content-muted mt-1 leading-relaxed">{tmpl.description}</div>
-                    <div className="flex items-center gap-1 mt-2">
-                      <span className="badge bg-surface-secondary text-content-muted text-xs">{tmpl.category}</span>
-                      <span className="text-xs text-content-muted">{tmpl.sprintNames.length} sprints</span>
-                    </div>
-                    {selectedTemplate === tmpl.id && <Check size={14} className="text-content-primary mt-2" />}
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* Body */}
+        <div className="flex-1 min-h-0 overflow-hidden">
+          {/* Blueprint Store step */}
+          {step === 'blueprint' && !isEdit && (
+            <BlueprintSelector
+              selected={selectedBlueprint}
+              onSelect={setSelectedBlueprint}
+            />
           )}
 
-          {/* Details Step */}
+          {/* Details step */}
           {(step === 'details' || isEdit) && (
-            <div className="p-6 space-y-5">
+            <div className="overflow-y-auto h-full p-6 space-y-5">
               {/* Icon + Name */}
               <div>
                 <label className="label">Project Name</label>
@@ -215,7 +210,6 @@ export function ProjectDialog({ open, project, onClose, onSave }: ProjectDialogP
                 />
               </div>
 
-              {/* Color */}
               <div>
                 <label className="label">Color</label>
                 <div className="flex gap-2 flex-wrap">
@@ -233,7 +227,6 @@ export function ProjectDialog({ open, project, onClose, onSave }: ProjectDialogP
                 </div>
               </div>
 
-              {/* Icon Picker */}
               <div>
                 <label className="label">Icon</label>
                 <div className="flex gap-2 flex-wrap">
@@ -257,7 +250,7 @@ export function ProjectDialog({ open, project, onClose, onSave }: ProjectDialogP
 
         {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-surface-border flex-shrink-0">
-          {step === 'template' && !isEdit ? (
+          {step === 'blueprint' && !isEdit ? (
             <>
               <div />
               <div className="flex gap-2">
@@ -270,7 +263,7 @@ export function ProjectDialog({ open, project, onClose, onSave }: ProjectDialogP
           ) : (
             <>
               {!isEdit && (
-                <button onClick={() => setStep('template')} className="btn-ghost">
+                <button onClick={() => setStep('blueprint')} className="btn-ghost">
                   ← Back
                 </button>
               )}

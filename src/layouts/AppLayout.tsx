@@ -14,7 +14,7 @@ export function AppLayout() {
   return (
     <div className="flex h-screen overflow-hidden bg-surface-primary">
       <Sidebar onCreateProject={openCreateProject} />
-      <main className="flex-1 overflow-y-auto min-w-0">
+      <main className="flex-1 min-w-0 h-screen overflow-hidden flex flex-col">
         <Outlet context={{ onCreateProject: openCreateProject }} />
       </main>
 

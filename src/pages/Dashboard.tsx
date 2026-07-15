@@ -42,136 +42,150 @@ export function Dashboard({ onCreateProject }: DashboardProps) {
   ];
 
   return (
-    <div className="p-8 max-w-7xl mx-auto animate-in">
-      {/* Header */}
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Dashboard</h1>
-          <p className="page-subtitle">Everything that matters at a glance.</p>
-        </div>
-        <button onClick={onCreateProject} className="btn-primary">
-          <Plus size={16} /> New Project
-        </button>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {stats.map(stat => (
-          <div key={stat.label} className="card">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-content-secondary text-sm">{stat.label}</span>
-              <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', stat.color)}>
-                {stat.icon}
-              </div>
-            </div>
-            <div className="text-3xl font-bold text-content-primary">{stat.value}</div>
+    <div className="flex-1 overflow-y-auto p-8 w-full animate-in">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">Dashboard</h1>
+            <p className="page-subtitle">Everything that matters at a glance.</p>
           </div>
-        ))}
-      </div>
+          <button onClick={onCreateProject} className="btn-primary">
+            <Plus size={16} /> New Project
+          </button>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left col */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Favorites */}
-          {favoriteProjects.length > 0 && (
+        {/* Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {stats.map(stat => (
+            <div key={stat.label} className="card">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-content-secondary text-sm">{stat.label}</span>
+                <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', stat.color)}>
+                  {stat.icon}
+                </div>
+              </div>
+              <div className="text-3xl font-bold text-content-primary">{stat.value}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left col */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Favorites */}
+            {favoriteProjects.length > 0 && (
+              <div className="card">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
+                    <Star size={14} className="text-amber-500" /> Favorites
+                  </h2>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {favoriteProjects.map(p => (
+                    <Link key={p.id} to={ROUTES.PROJECT_OVERVIEW(p.id)} className="flex items-center gap-3 p-3 rounded-xl border border-surface-border hover:bg-surface-secondary transition-colors group">
+                      <div className="w-9 h-9 rounded-lg flex items-center justify-center text-lg flex-shrink-0" style={{ backgroundColor: p.color + '33' }}>
+                        {p.icon}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-content-primary truncate">{p.name}</div>
+                        <div className="text-xs text-content-muted">{p.status}</div>
+                      </div>
+                      <ArrowRight size={14} className="text-content-muted ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Active Projects */}
             <div className="card">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
-                  <Star size={14} className="text-amber-500" /> Favorites
+                  <TrendingUp size={14} /> Active Projects Progress
                 </h2>
+                <Link to={ROUTES.PROJECTS} className="text-xs text-content-secondary hover:text-content-primary">All Projects →</Link>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {favoriteProjects.map(p => (
-                  <Link key={p.id} to={ROUTES.PROJECT_OVERVIEW(p.id)} className="flex items-center gap-3 p-3 rounded-xl border border-surface-border hover:bg-surface-secondary transition-colors group">
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center text-lg flex-shrink-0" style={{ backgroundColor: p.color + '33' }}>
-                      {p.icon}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium text-content-primary truncate">{p.name}</div>
-                      <div className="text-xs text-content-muted">{p.status}</div>
-                    </div>
-                    <ArrowRight size={14} className="text-content-muted ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </Link>
-                ))}
-              </div>
+              {activeProjects.length === 0 ? (
+                <EmptyState
+                  icon="📦"
+                  title="No active projects"
+                  description="Create a project to start tracking tasks and sprints."
+                  action={<button onClick={onCreateProject} className="btn-yellow">Create Project</button>}
+                />
+              ) : (
+                <div className="space-y-4">
+                  {activeProjects.slice(0, 5).map(p => {
+                    const pTasks = TaskStorage.getByProject(p.id);
+                    const completed = pTasks.filter(t => t.status === 'done').length;
+                    const pct = pTasks.length > 0 ? Math.round((completed / pTasks.length) * 100) : 0;
+                    return (
+                      <Link key={p.id} to={ROUTES.PROJECT_OVERVIEW(p.id)} className="block hover:bg-surface-secondary/40 p-2 -mx-2 rounded-lg transition-colors">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-sm">{p.icon}</span>
+                            <span className="text-xs font-semibold text-content-primary truncate">{p.name}</span>
+                          </div>
+                          <span className="text-xs font-medium text-content-secondary">{pct}%</span>
+                        </div>
+                        <div className="w-full bg-surface-secondary rounded-full h-1.5">
+                          <div className="h-1.5 rounded-full transition-all duration-300" style={{ width: `${pct}%`, backgroundColor: p.color }} />
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          )}
 
-          {/* Active Projects */}
-          <div className="card">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-content-primary">Projects In Progress</h2>
-              <Link to={ROUTES.PROJECTS} className="text-xs text-content-secondary hover:text-content-primary transition-colors">View all →</Link>
-            </div>
-            {activeProjects.length === 0 ? (
-              <EmptyState
-                icon="🚀"
-                title="Nothing in Progress"
-                description="Every great product starts as an idea. Create your first project to begin."
-                action={
-                  <button onClick={onCreateProject} className="btn-yellow text-sm">
-                    Start Building
-                  </button>
-                }
-              />
-            ) : (
-              <div className="space-y-2">
-                {activeProjects.slice(0, 6).map(p => (
-                  <Link key={p.id} to={ROUTES.PROJECT_OVERVIEW(p.id)} className="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-secondary transition-colors group">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0" style={{ backgroundColor: p.color + '33' }}>
-                      {p.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-content-primary truncate">{p.name}</span>
-                        <span className="text-xs text-content-muted">{p.progress}%</span>
-                      </div>
-                      <div className="w-full bg-surface-secondary rounded-full h-1.5 mt-1.5">
-                        <div className="h-1.5 rounded-full bg-content-primary transition-all" style={{ width: `${p.progress}%` }} />
-                      </div>
-                    </div>
-                    <ArrowRight size={13} className="text-content-muted opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                  </Link>
-                ))}
+            {/* Sprints Focus */}
+            {activeSprints.length > 0 && (
+              <div className="card">
+                <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
+                  <Zap size={14} className="text-amber-500" /> Sprints in Focus
+                </h2>
+                <div className="space-y-3">
+                  {activeSprints.map(s => {
+                    const p = projects.find(proj => proj.id === s.projectId);
+                    if (!p) return null;
+                    const sTasks = TaskStorage.getBySprint(s.id);
+                    const doneCount = sTasks.filter(t => t.status === 'done').length;
+                    const pct = sTasks.length > 0 ? Math.round((doneCount / sTasks.length) * 100) : 0;
+                    return (
+                      <Link key={s.id} to={ROUTES.PROJECT_SPRINTS(s.projectId)} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl border border-surface-border hover:bg-surface-secondary transition-colors">
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-content-primary">{s.name}</span>
+                            <span className="text-[10px] text-content-muted font-semibold bg-surface-secondary border border-surface-border px-1.5 py-0.5 rounded-md">
+                              {p.name}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-content-muted block mt-0.5">Ends {formatDate(s.endDate)}</span>
+                        </div>
+                        <div className="flex items-center gap-3 w-full sm:w-44 flex-shrink-0">
+                          <div className="flex-1 bg-surface-secondary rounded-full h-1.5">
+                            <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, backgroundColor: p.color }} />
+                          </div>
+                          <span className="text-xs font-semibold text-content-secondary min-w-[28px] text-right">{pct}%</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
 
-          {/* Active Sprints */}
-          {activeSprints.length > 0 && (
+          {/* Right col — Activity */}
+          <div className="space-y-6">
             <div className="card">
-              <h2 className="text-sm font-semibold text-content-primary mb-4 flex items-center gap-2">
-                <Zap size={14} className="text-amber-500" /> Active Sprints
-              </h2>
-              <div className="space-y-2">
-                {activeSprints.map(sprint => {
-                  const proj = projects.find(p => p.id === sprint.projectId);
-                  return (
-                    <Link key={sprint.id} to={ROUTES.PROJECT_SPRINTS(sprint.projectId)} className="flex items-center gap-3 p-3 rounded-xl border border-surface-border hover:bg-surface-secondary transition-colors">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-50 text-amber-600 text-sm flex-shrink-0">
-                        <Zap size={14} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-content-primary">{sprint.name}</div>
-                        <div className="text-xs text-content-muted">{proj?.name} · Ends {formatDate(sprint.endDate)}</div>
-                      </div>
-                    </Link>
-                  );
-                })}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
+                  <Clock size={14} /> Recent Activity
+                </h2>
               </div>
+              <ActivityFeed activities={activities} limit={15} />
             </div>
-          )}
-        </div>
-
-        {/* Right col — Activity */}
-        <div className="space-y-6">
-          <div className="card">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
-                <Clock size={14} /> Recent Activity
-              </h2>
-            </div>
-            <ActivityFeed activities={activities} limit={15} />
           </div>
         </div>
       </div>
