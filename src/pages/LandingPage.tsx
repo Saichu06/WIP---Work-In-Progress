@@ -234,7 +234,7 @@ export function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeWorkflow, setActiveWorkflow] = useState(0);
-  const workflowRef = useRef<NodeJS.Timeout | null>(null);
+  const workflowRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);

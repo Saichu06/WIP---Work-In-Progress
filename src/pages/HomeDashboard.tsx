@@ -3,29 +3,25 @@ import { Link } from 'react-router-dom';
 import {
   Plus, TrendingUp, CheckSquare, Zap, Star, ArrowRight,
   Clock, Target, LayoutGrid, FileText, Code2, FolderOpen,
-  ChevronRight, Sparkles
+  ChevronRight, Sparkles, User, BarChart2
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { ActivityStorage } from '@/storage/ActivityStorage';
 import { TaskStorage } from '@/storage/TaskStorage';
 import { SprintStorage } from '@/storage/SprintStorage';
+import { StatisticsStorage } from '@/storage/StatisticsStorage';
+import { RecentStorage } from '@/storage/RecentStorage';
 import { ActivityFeed } from '@/components/common/ActivityFeed';
 import { EmptyState } from '@/components/common/EmptyState';
+import { Avatar } from '@/components/common/Avatar';
 import { ROUTES } from '@/constants';
 import { cn, formatDate } from '@/utils';
-import type { ActivityLog, Task, Sprint } from '@/types';
+import type { ActivityLog, Task, Sprint, UserStatistics } from '@/types';
 
 interface HomeDashboardProps {
   onCreateProject: () => void;
 }
-
-const QUICK_ACTIONS = [
-  { icon: LayoutGrid, label: 'New Project', action: 'create' as const, color: 'text-blue-600 bg-blue-50 border-blue-100' },
-  { icon: FolderOpen, label: 'All Projects', href: ROUTES.PROJECTS, color: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
-  { icon: FileText, label: 'Recent Docs', href: '#docs', color: 'text-purple-600 bg-purple-50 border-purple-100' },
-  { icon: Code2, label: 'Snippets', href: '#snippets', color: 'text-amber-600 bg-amber-50 border-amber-100' },
-];
 
 function getGreeting(): string {
   const h = new Date().getHours();
@@ -34,11 +30,14 @@ function getGreeting(): string {
   return 'Good evening';
 }
 
+function getSubtitle(inProgress: number, active: number): string {
+  if (inProgress > 0) return `You have ${inProgress} task${inProgress !== 1 ? 's' : ''} in progress across ${active} project${active !== 1 ? 's' : ''}.`;
+  if (active > 0) return `You have ${active} active project${active !== 1 ? 's' : ''}. Ready to continue?`;
+  return 'Your workspace is ready. Start by creating your first project.';
+}
+
 function getTodaysTasks(projectIds: string[]): Task[] {
-  const allTasks = TaskStorage.get();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return allTasks.filter(t =>
+  return TaskStorage.get().filter(t =>
     projectIds.includes(t.projectId) &&
     t.status !== 'done' &&
     (t.priority === 'critical' || t.priority === 'high') &&
@@ -48,16 +47,18 @@ function getTodaysTasks(projectIds: string[]): Task[] {
 
 export function HomeDashboard({ onCreateProject }: HomeDashboardProps) {
   const { projects } = useApp();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [activeSprints, setActiveSprints] = useState<Sprint[]>([]);
   const [todaysTasks, setTodaysTasks] = useState<Task[]>([]);
+  const [stats, setStats] = useState<UserStatistics | null>(null);
 
   useEffect(() => {
     setActivities(ActivityStorage.getRecent(30));
     const sprints = SprintStorage.get();
     setActiveSprints(sprints.filter(s => s.status === 'active').slice(0, 4));
     setTodaysTasks(getTodaysTasks(projects.map(p => p.id)));
+    setStats(StatisticsStorage.recalculate());
   }, [projects]);
 
   const activeProjects = projects.filter(p => p.status === 'active');
@@ -67,7 +68,22 @@ export function HomeDashboard({ onCreateProject }: HomeDashboardProps) {
   const inProgressTasks = allTasks.filter(t => t.status === 'in-progress');
   const totalProgress = allTasks.length > 0 ? Math.round((doneTasks.length / allTasks.length) * 100) : 0;
 
-  const firstName = user?.name?.split(' ')[0] || 'there';
+  const firstName = profile?.fullName?.split(' ')[0] || user?.name?.split(' ')[0] || 'there';
+  const avatarSrc = profile?.profileImage || user?.avatar;
+
+  // Recent projects from RecentStorage
+  const recentIds = RecentStorage.getRecentProjects();
+  const recentProjects = recentIds
+    .map(id => projects.find(p => p.id === id))
+    .filter(Boolean)
+    .slice(0, 3) as typeof projects;
+
+  const QUICK_ACTIONS = [
+    { icon: LayoutGrid, label: 'New Project', action: 'create' as const, color: 'text-blue-600 bg-blue-50 border-blue-100' },
+    { icon: FolderOpen, label: 'All Projects', href: ROUTES.PROJECTS, color: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
+    { icon: User, label: 'My Profile', href: '/profile', color: 'text-purple-600 bg-purple-50 border-purple-100' },
+    { icon: Code2, label: 'Snippets', href: '#snippets', color: 'text-amber-600 bg-amber-50 border-amber-100' },
+  ];
 
   return (
     <div className="flex-1 overflow-y-auto bg-surface-primary animate-in">
@@ -76,34 +92,23 @@ export function HomeDashboard({ onCreateProject }: HomeDashboardProps) {
         {/* ── Header ── */}
         <div className="mb-8">
           <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[11px] font-bold text-content-muted uppercase tracking-widest">
-                  {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                </span>
+            <div className="flex items-center gap-3">
+              <Avatar src={avatarSrc} name={firstName} size="lg" />
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-[11px] font-bold text-content-muted uppercase tracking-widest">
+                    {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                  </span>
+                </div>
+                <h1 className="text-2xl font-bold text-content-primary">
+                  {getGreeting()}, {firstName} 👋
+                </h1>
+                <p className="text-sm text-content-secondary mt-0.5">
+                  {getSubtitle(inProgressTasks.length, activeProjects.length)}
+                </p>
               </div>
-              <h1 className="text-2xl font-bold text-content-primary">
-                {getGreeting()}, {firstName}.
-              </h1>
-              {inProgressTasks.length > 0 ? (
-                <p className="text-sm text-content-secondary mt-1">
-                  You have{' '}
-                  <span className="font-semibold text-content-primary">{inProgressTasks.length} task{inProgressTasks.length !== 1 ? 's' : ''}</span>{' '}
-                  in progress across{' '}
-                  <span className="font-semibold text-content-primary">{activeProjects.length} project{activeProjects.length !== 1 ? 's' : ''}</span>.
-                </p>
-              ) : (
-                <p className="text-sm text-content-secondary mt-1">
-                  {activeProjects.length > 0
-                    ? `You have ${activeProjects.length} active project${activeProjects.length !== 1 ? 's' : ''}. Ready to continue?`
-                    : 'Your workspace is ready. Start by creating your first project.'}
-                </p>
-              )}
             </div>
-            <button
-              onClick={onCreateProject}
-              className="btn-primary flex-shrink-0 hidden sm:flex"
-            >
+            <button onClick={onCreateProject} className="btn-primary flex-shrink-0 hidden sm:flex">
               <Plus size={15} /> New Project
             </button>
           </div>
@@ -190,6 +195,45 @@ export function HomeDashboard({ onCreateProject }: HomeDashboardProps) {
 
           {/* ── Left 2-col ── */}
           <div className="lg:col-span-2 space-y-6">
+
+            {/* Continue Working — Recent Projects */}
+            {recentProjects.length > 0 && (
+              <div className="card">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
+                    <Clock size={13} className="text-blue-500" /> Continue Working
+                  </h2>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {recentProjects.map(p => {
+                    const pTasks = TaskStorage.getByProject(p.id);
+                    const done = pTasks.filter(t => t.status === 'done').length;
+                    const pct = pTasks.length > 0 ? Math.round((done / pTasks.length) * 100) : 0;
+                    return (
+                      <Link
+                        key={p.id}
+                        to={ROUTES.PROJECT_OVERVIEW(p.id)}
+                        className="flex items-center gap-3 p-3 rounded-xl border border-surface-border hover:bg-surface-secondary transition-colors group"
+                        onClick={() => RecentStorage.addRecentProject(p.id)}
+                      >
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0" style={{ backgroundColor: p.color + '22' }}>
+                          {p.icon}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-xs font-semibold text-content-primary truncate">{p.name}</div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="flex-1 h-1 bg-surface-secondary rounded-full overflow-hidden">
+                              <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: p.color }} />
+                            </div>
+                            <span className="text-[10px] text-content-muted font-medium">{pct}%</span>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Pinned / Favorites */}
             {favoriteProjects.length > 0 && (
@@ -303,6 +347,7 @@ export function HomeDashboard({ onCreateProject }: HomeDashboardProps) {
                         key={p.id}
                         to={ROUTES.PROJECT_OVERVIEW(p.id)}
                         className="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-secondary transition-colors group"
+                        onClick={() => RecentStorage.addRecentProject(p.id)}
                       >
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0" style={{ backgroundColor: p.color + '22' }}>
                           {p.icon}
@@ -344,8 +389,7 @@ export function HomeDashboard({ onCreateProject }: HomeDashboardProps) {
                     const sTasks = TaskStorage.getBySprint(s.id);
                     const done = sTasks.filter(t => t.status === 'done').length;
                     const pct = sTasks.length > 0 ? Math.round((done / sTasks.length) * 100) : 0;
-                    const endDate = new Date(s.endDate);
-                    const daysLeft = Math.ceil((endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                    const daysLeft = Math.ceil((new Date(s.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
                     return (
                       <Link
                         key={s.id}
@@ -379,6 +423,30 @@ export function HomeDashboard({ onCreateProject }: HomeDashboardProps) {
 
           {/* ── Right col ── */}
           <div className="space-y-6">
+            {/* Workspace Stats */}
+            {stats && (
+              <div className="card">
+                <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
+                  <BarChart2 size={13} /> Workspace Stats
+                </h2>
+                <div className="space-y-2.5">
+                  {[
+                    { label: 'Tasks Created', value: stats.tasksCreated },
+                    { label: 'Tasks Done', value: stats.tasksCompleted },
+                    { label: 'Documents', value: stats.documentsCreated },
+                    { label: 'Snippets', value: stats.snippetsCreated },
+                    { label: 'Days Active', value: stats.daysActive },
+                    { label: 'Current Streak', value: `${stats.currentStreak}d 🔥` },
+                  ].map(s => (
+                    <div key={s.label} className="flex items-center justify-between text-xs">
+                      <span className="text-content-muted">{s.label}</span>
+                      <span className="font-semibold text-content-primary">{s.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Activity */}
             <div className="card">
               <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">

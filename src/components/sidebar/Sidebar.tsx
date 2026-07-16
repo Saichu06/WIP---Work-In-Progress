@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, FolderOpen, Search, Settings, Bell, ChevronLeft,
-  ChevronRight, Plus, Star, Archive, MoreHorizontal, Zap, ChevronDown
+  LayoutDashboard, FolderOpen, Search,
+  ChevronLeft, ChevronRight, Plus, Star, ChevronDown
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { ProjectStorage } from '@/storage/ProjectStorage';
@@ -10,6 +10,7 @@ import { ActivityStorage } from '@/storage/ActivityStorage';
 import { ROUTES } from '@/constants';
 import { cn, truncate } from '@/utils';
 import type { Project } from '@/types';
+import { SidebarUserCard } from './SidebarUserCard';
 
 interface SidebarProps {
   onCreateProject: () => void;
@@ -120,10 +121,8 @@ export function Sidebar({ onCreateProject }: SidebarProps) {
         ))}
       </nav>
 
-      {/* Bottom Nav */}
-      <div className="p-2 border-t border-surface-border space-y-0.5">
-        <SidebarItem to={ROUTES.NOTIFICATIONS} icon={<Bell size={16} />} label="Notifications" collapsed={sidebarCollapsed} />
-        <SidebarItem to={ROUTES.SETTINGS} icon={<Settings size={16} />} label="Settings" collapsed={sidebarCollapsed} />
+      {/* Collapse Toggle */}
+      <div className="px-2 pb-1">
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className={cn('sidebar-link w-full', sidebarCollapsed && 'justify-center px-0')}
@@ -131,6 +130,11 @@ export function Sidebar({ onCreateProject }: SidebarProps) {
         >
           {sidebarCollapsed ? <ChevronRight size={16} /> : <><ChevronLeft size={16} /><span className="text-xs">Collapse</span></>}
         </button>
+      </div>
+
+      {/* ── User Card (bottom) ── */}
+      <div className="border-t border-surface-border">
+        <SidebarUserCard collapsed={sidebarCollapsed} />
       </div>
     </aside>
   );
@@ -160,7 +164,6 @@ function ProjectItem({ project, collapsed, onFavorite, onArchive }: {
   onFavorite: (e: React.MouseEvent, p: Project) => void;
   onArchive: (e: React.MouseEvent, p: Project) => void;
 }) {
-  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <NavLink
       to={ROUTES.PROJECT_OVERVIEW(project.id)}

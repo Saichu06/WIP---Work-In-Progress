@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import type { Project, WorkspaceSettings } from '@/types';
+import type { Project, WorkspaceSettings, AppNotification, UserPreferences } from '@/types';
 import { ProjectStorage } from '@/storage/ProjectStorage';
 import { SettingsStorage } from '@/storage/SettingsStorage';
+import { NotificationStorage } from '@/storage/NotificationStorage';
+import { PreferenceStorage } from '@/storage/PreferenceStorage';
 
 interface AppContextValue {
   projects: Project[];
@@ -14,16 +16,16 @@ interface AppContextValue {
   setSearchOpen: (open: boolean) => void;
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (v: boolean) => void;
-  notifications: Notification[];
-}
-
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-  read: boolean;
-  createdAt: string;
+  // Notifications
+  notifications: AppNotification[];
+  unreadCount: number;
+  refreshNotifications: () => void;
+  markNotificationRead: (id: string) => void;
+  markAllNotificationsRead: () => void;
+  clearNotifications: () => void;
+  // Preferences
+  preferences: UserPreferences;
+  updatePreferences: (data: Partial<UserPreferences>) => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -34,7 +36,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [commandOpen, setCommandOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsedState] = useState(SettingsStorage.get().sidebarCollapsed);
-  const [notifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [preferences, setPreferences] = useState<UserPreferences>(PreferenceStorage.get());
 
   const refreshProjects = useCallback(() => {
     setProjects(ProjectStorage.get());
@@ -44,15 +47,45 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setSettings(SettingsStorage.get());
   }, []);
 
+  const refreshNotifications = useCallback(() => {
+    setNotifications(NotificationStorage.get());
+  }, []);
+
   const setSidebarCollapsed = useCallback((v: boolean) => {
     setSidebarCollapsedState(v);
     SettingsStorage.update({ sidebarCollapsed: v });
   }, []);
 
+  const markNotificationRead = useCallback((id: string) => {
+    NotificationStorage.markRead(id);
+    refreshNotifications();
+  }, [refreshNotifications]);
+
+  const markAllNotificationsRead = useCallback(() => {
+    NotificationStorage.markAllRead();
+    refreshNotifications();
+  }, [refreshNotifications]);
+
+  const clearNotifications = useCallback(() => {
+    NotificationStorage.clear();
+    refreshNotifications();
+  }, [refreshNotifications]);
+
+  const updatePreferences = useCallback((data: Partial<UserPreferences>) => {
+    const updated = PreferenceStorage.update(data);
+    setPreferences(updated);
+    // Sync accentColor to settings if changed
+    if (data.accentColor) {
+      SettingsStorage.update({ accentColor: data.accentColor });
+    }
+  }, []);
+
   useEffect(() => {
     refreshProjects();
     refreshSettings();
-  }, [refreshProjects, refreshSettings]);
+    refreshNotifications();
+    setPreferences(PreferenceStorage.get());
+  }, [refreshProjects, refreshSettings, refreshNotifications]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -65,13 +98,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
+  const unreadCount = notifications.filter(n => !n.read).length;
+
   return (
     <AppContext.Provider value={{
       projects, settings, refreshProjects, refreshSettings,
       commandOpen, setCommandOpen,
       searchOpen, setSearchOpen,
       sidebarCollapsed, setSidebarCollapsed,
-      notifications,
+      notifications, unreadCount,
+      refreshNotifications,
+      markNotificationRead, markAllNotificationsRead, clearNotifications,
+      preferences, updatePreferences,
     }}>
       {children}
     </AppContext.Provider>

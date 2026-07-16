@@ -36,12 +36,11 @@ export const AuthStorage = {
   },
 
   login(email: string, _password: string, remember: boolean): AuthUser | null {
-    // In production, this would call an API. For now, we check stored user.
     const user = this.getUser();
     if (user && user.email.toLowerCase() === email.toLowerCase()) {
       const expiresAt = remember
-        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
-        : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 1 day
+        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
       localStorage.setItem(SESSION_KEY, JSON.stringify({ token: uuidv4(), expiresAt }));
       return user;
     }
@@ -66,10 +65,15 @@ export const AuthStorage = {
     localStorage.removeItem(SESSION_KEY);
   },
 
+  /**
+   * Update the AuthUser record — keeps auth-layer fields in sync when
+   * profile data changes (name, avatar, workspaceName).
+   */
   updateUser(data: Partial<AuthUser>): void {
     const user = this.getUser();
     if (user) {
-      localStorage.setItem(USER_KEY, JSON.stringify({ ...user, ...data }));
+      const updated = { ...user, ...data };
+      localStorage.setItem(USER_KEY, JSON.stringify(updated));
     }
   },
 };

@@ -250,6 +250,7 @@ export const ROUTES = {
   SEARCH: '/search',
   NOTIFICATIONS: '/notifications',
   SETTINGS: '/settings',
+  PROFILE: '/profile',
   PROJECT: (id: string) => `/projects/${id}`,
   PROJECT_OVERVIEW: (id: string) => `/projects/${id}/overview`,
   PROJECT_PLANNING: (id: string) => `/projects/${id}/planning`,

@@ -16,7 +16,76 @@ export type ActivityType =
   | 'doc_created' | 'doc_updated' | 'doc_deleted'
   | 'snippet_created' | 'snippet_updated' | 'snippet_deleted'
   | 'asset_uploaded' | 'asset_deleted'
-  | 'planning_updated' | 'settings_updated';
+  | 'planning_updated' | 'settings_updated'
+  | 'user_login' | 'user_logout' | 'profile_updated' | 'blueprint_created';
+
+export type AppNotificationType = 'task_created' | 'task_completed' | 'sprint_started' | 'sprint_completed'
+  | 'blueprint_imported' | 'doc_updated' | 'asset_uploaded' | 'project_created' | 'info';
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  message: string;
+  type: AppNotificationType;
+  read: boolean;
+  entityId?: string;
+  projectId?: string;
+  createdAt: string;
+}
+
+export interface UserProfile {
+  id: string;
+  fullName: string;
+  username: string;
+  email: string;
+  bio: string;
+  profileImage?: string; // Base64 data URL
+  role: string;
+  company: string;
+  location: string;
+  website: string;
+  github: string;
+  linkedin: string;
+  twitter: string;
+  timezone: string;
+  language: string;
+  workspaceName: string;
+  createdAt: string;
+  updatedAt: string;
+  lastLogin: string;
+}
+
+export interface UserStatistics {
+  projectsCreated: number;
+  tasksCreated: number;
+  tasksCompleted: number;
+  sprintsStarted: number;
+  sprintsCompleted: number;
+  documentsCreated: number;
+  snippetsCreated: number;
+  assetsUploaded: number;
+  blueprintsUsed: number;
+  daysActive: number;
+  currentStreak: number;
+  longestStreak: number;
+  lastActiveDate: string;
+}
+
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  sidebarDensity: 'compact' | 'comfortable' | 'expanded';
+  cardRadius: 'none' | 'sm' | 'md' | 'lg';
+  reducedMotion: boolean;
+  fontSize: 'small' | 'medium' | 'large';
+  accentColor: string;
+  notificationsEnabled: boolean;
+  notifyTaskCreated: boolean;
+  notifyTaskCompleted: boolean;
+  notifySprintStarted: boolean;
+  notifyBlueprintImported: boolean;
+  notifyDocUpdated: boolean;
+  notifyAssetUploaded: boolean;
+}
 
 export interface Project {
   id: string;
