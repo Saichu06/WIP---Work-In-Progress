@@ -21,6 +21,7 @@ import { SearchPage } from '@/pages/Search';
 import { Notifications } from '@/pages/Notifications';
 import { Settings } from '@/pages/Settings';
 import { Profile } from '@/pages/Profile';
+import { BlueprintLibrary } from '@/pages/BlueprintLibrary';
 import { ProjectOverview } from '@/pages/project/ProjectOverview';
 import { ProjectPlanning } from '@/pages/project/ProjectPlanning';
 import { ProjectBacklog } from '@/pages/project/ProjectBacklog';
@@ -91,6 +92,7 @@ export function App() {
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="profile" element={<Profile />} />
+                <Route path="blueprints" element={<BlueprintLibrary />} />
 
                 <Route path="projects/:id" element={<ProjectLayout />}>
                   <Route index element={<Navigate to="overview" replace />} />

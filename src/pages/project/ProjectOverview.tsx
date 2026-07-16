@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { Zap, CheckSquare, FileText, Clock, TrendingUp, Plus } from 'lucide-react';
+import { Zap, CheckSquare, FileText, Clock, TrendingUp, Plus, Code2, Image, Map } from 'lucide-react';
 import { TaskStorage } from '@/storage/TaskStorage';
 import { SprintStorage } from '@/storage/SprintStorage';
 import { DocumentStorage } from '@/storage/DocumentStorage';
@@ -131,15 +131,15 @@ export function ProjectOverview() {
               <h2 className="text-sm font-semibold text-content-primary mb-4">Quick Actions</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
-                  { to: ROUTES.PROJECT_BACKLOG(project.id), icon: '📋', label: 'Add Task' },
-                  { to: ROUTES.PROJECT_SPRINTS(project.id), icon: '⚡', label: 'Plan Sprint' },
-                  { to: ROUTES.PROJECT_DOCS(project.id), icon: '📄', label: 'Write Docs' },
-                  { to: ROUTES.PROJECT_SNIPPETS(project.id), icon: '💻', label: 'Add Snippet' },
-                  { to: ROUTES.PROJECT_ASSETS(project.id), icon: '🖼️', label: 'Upload Asset' },
-                  { to: ROUTES.PROJECT_PLANNING(project.id), icon: '🗺️', label: 'Update Plan' },
+                  { to: ROUTES.PROJECT_BACKLOG(project.id), icon: <CheckSquare size={16} className="text-content-secondary" />, label: 'Add Task' },
+                  { to: ROUTES.PROJECT_SPRINTS(project.id), icon: <Zap size={16} className="text-content-secondary" />, label: 'Plan Sprint' },
+                  { to: ROUTES.PROJECT_DOCS(project.id), icon: <FileText size={16} className="text-content-secondary" />, label: 'Write Docs' },
+                  { to: ROUTES.PROJECT_SNIPPETS(project.id), icon: <Code2 size={16} className="text-content-secondary" />, label: 'Add Snippet' },
+                  { to: ROUTES.PROJECT_ASSETS(project.id), icon: <Image size={16} className="text-content-secondary" />, label: 'Upload Asset' },
+                  { to: ROUTES.PROJECT_PLANNING(project.id), icon: <Map size={16} className="text-content-secondary" />, label: 'Update Plan' },
                 ].map(a => (
                   <Link key={a.to} to={a.to} className="flex items-center gap-2.5 p-3 rounded-xl border border-surface-border hover:bg-surface-secondary transition-colors text-sm font-medium text-content-primary">
-                    <span>{a.icon}</span> {a.label}
+                    {a.icon} <span>{a.label}</span>
                   </Link>
                 ))}
               </div>

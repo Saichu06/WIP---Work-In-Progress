@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, FolderOpen, Search,
-  ChevronLeft, ChevronRight, Plus, Star, ChevronDown
+  ChevronLeft, ChevronRight, Plus, Star, ChevronDown, Compass
 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { ProjectStorage } from '@/storage/ProjectStorage';
@@ -59,6 +59,7 @@ export function Sidebar({ onCreateProject }: SidebarProps) {
       <nav className="flex-1 overflow-y-auto p-2 space-y-0.5">
         <SidebarItem to={ROUTES.DASHBOARD} icon={<LayoutDashboard size={16} />} label="Dashboard" collapsed={sidebarCollapsed} />
         <SidebarItem to={ROUTES.PROJECTS} icon={<FolderOpen size={16} />} label="Projects" collapsed={sidebarCollapsed} />
+        <SidebarItem to={ROUTES.BLUEPRINTS} icon={<Compass size={16} />} label="Blueprint Store" collapsed={sidebarCollapsed} />
         <button
           onClick={() => setCommandOpen(true)}
           className={cn('sidebar-link w-full', sidebarCollapsed && 'justify-center px-0')}

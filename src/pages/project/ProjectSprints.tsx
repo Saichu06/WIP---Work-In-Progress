@@ -165,7 +165,7 @@ export function ProjectSprints() {
         )}
 
         {sprints.length === 0 ? (
-          <EmptyState icon="⚡" title="No sprints yet" description="Break your project into focused sprints. Start with a 2-week sprint." action={<button onClick={() => setShowForm(true)} className="btn-yellow">Create First Sprint</button>} />
+          <EmptyState icon={<Zap className="text-content-muted" size={24} />} title="No sprints yet" description="Break your project into focused sprints. Start with a 2-week sprint." action={<button onClick={() => setShowForm(true)} className="btn-yellow">Create First Sprint</button>} />
         ) : (
           <div className="space-y-8">
             {(['active', 'planning', 'completed'] as SprintStatus[]).map(status => {

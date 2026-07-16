@@ -6,8 +6,8 @@ export const PROJECT_COLORS = [
 ];
 
 export const PROJECT_ICONS = [
-  '📦', '🚀', '⚡', '🎯', '🔥', '💡', '🛠️', '🌐', '📱', '🤖',
-  '🎨', '📊', '🔬', '🏗️', '⚙️', '📝', '🎮', '💎', '🌟', '🔐',
+  '◈', '✦', '❖', '⌬', '⬢', '⬡', '⚙', '⚡', '♾', '⚿',
+  '◼', '▲', '◆', '●', '⬧', '⌬', '⚛', '⛭', '⚙', '⚏'
 ];
 
 export const TASK_STATUS_LABELS: Record<string, string> = {
@@ -251,6 +251,7 @@ export const ROUTES = {
   NOTIFICATIONS: '/notifications',
   SETTINGS: '/settings',
   PROFILE: '/profile',
+  BLUEPRINTS: '/blueprints',
   PROJECT: (id: string) => `/projects/${id}`,
   PROJECT_OVERVIEW: (id: string) => `/projects/${id}/overview`,
   PROJECT_PLANNING: (id: string) => `/projects/${id}/planning`,

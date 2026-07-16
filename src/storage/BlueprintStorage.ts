@@ -38,15 +38,52 @@ export const BlueprintStorage = {
     return all.filter(b => b.category === category);
   },
 
-  /** Search blueprints by name or description */
+  /** Search blueprints by name, description, tags, stack, difficulty, category, or audience */
   search(query: string): Blueprint[] {
-    const q = query.toLowerCase();
+    const q = query.toLowerCase().trim();
+    if (!q) return this.getAll();
     return this.getAll().filter(b =>
       b.name.toLowerCase().includes(q) ||
       b.description.toLowerCase().includes(q) ||
       b.category.toLowerCase().includes(q) ||
-      b.features.some(f => f.toLowerCase().includes(q))
+      (b.tags && b.tags.some(t => t.toLowerCase().includes(q))) ||
+      (b.recommendedStack && b.recommendedStack.some(s => s.toLowerCase().includes(q))) ||
+      (b.difficulty && b.difficulty.toLowerCase().includes(q)) ||
+      (b.audience && b.audience.toLowerCase().includes(q))
     );
+  },
+
+  /** Get list of favorite blueprint IDs */
+  getFavorites(): string[] {
+    try {
+      return JSON.parse(localStorage.getItem('wip_fav_blueprints') || '[]');
+    } catch {
+      return [];
+    }
+  },
+
+  /** Toggle favorite status of a blueprint */
+  toggleFavorite(id: string): void {
+    const favs = this.getFavorites();
+    const updated = favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id];
+    localStorage.setItem('wip_fav_blueprints', JSON.stringify(updated));
+  },
+
+  /** Get recently used blueprint IDs */
+  getRecentlyUsed(): string[] {
+    try {
+      return JSON.parse(localStorage.getItem('wip_recent_blueprints') || '[]');
+    } catch {
+      return [];
+    }
+  },
+
+  /** Record that a blueprint was used */
+  recordUsed(id: string): void {
+    const recents = this.getRecentlyUsed();
+    const filtered = recents.filter(r => r !== id);
+    const updated = [id, ...filtered].slice(0, 10);
+    localStorage.setItem('wip_recent_blueprints', JSON.stringify(updated));
   },
 
   /** Save a project as a custom blueprint */

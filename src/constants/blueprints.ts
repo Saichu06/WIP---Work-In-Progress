@@ -1,495 +1,399 @@
-import type { Blueprint } from '@/types';
+import type { Blueprint, BlueprintCategory, Task, PlanningSection, SnippetLanguage } from '@/types';
 
-export const OFFICIAL_BLUEPRINTS: Blueprint[] = [
-  // ── DEVELOPMENT ─────────────────────────────────────────────────────────────
+// Raw metadata for all 80+ blueprints
+export const BLUEPRINT_METADATA: Omit<Blueprint, 'features' | 'planningItems' | 'sprintNames' | 'labels' | 'defaultDocs' | 'sampleTasks' | 'defaultSnippets'>[] = [
+  // ── featured ──
   {
-    id: 'mern-stack',
-    name: 'MERN Stack App',
-    description: 'Full-stack MongoDB, Express, React, Node.js application with architecture docs and API design.',
-    icon: '🌐',
-    color: '#60A5FA',
-    category: 'Development',
-    setupTime: '~3 min',
-    audience: 'Full-stack teams',
-    features: ['6 Kanban columns', '5 sprints', 'API & setup docs', 'JWT auth tasks', 'CI/CD tasks'],
-    planningItems: [
-      { title: 'Vision', content: '## Vision\nBuild a scalable full-stack web application using the MERN stack.', order: 0 },
-      { title: 'Architecture Notes', content: '## Architecture\n- **Frontend**: React + Vite\n- **Backend**: Node.js + Express\n- **Database**: MongoDB\n- **Auth**: JWT', order: 1 },
-      { title: 'API Design', content: '## API Endpoints\n- `GET /api/users`\n- `POST /api/auth/login`\n- `POST /api/auth/register`', order: 2 },
-    ],
-    sprintNames: ['Setup & Architecture', 'Backend API', 'Frontend UI', 'Integration & Testing', 'Deployment'],
-    labels: ['frontend', 'backend', 'api', 'database', 'auth', 'ui', 'testing', 'deployment'],
-    defaultDocs: [
-      { title: 'Project Setup Guide', content: '# Project Setup\n\n## Prerequisites\n- Node.js 18+\n- MongoDB\n\n## Installation\n```bash\nnpm install\nnpm run dev\n```' },
-      { title: 'API Documentation', content: '# API Docs\n\n## Auth\nAll protected routes require `Authorization: Bearer <token>`.' },
-    ],
-    sampleTasks: [
-      { title: 'Initialize Express server', description: 'Set up Node.js + Express with middleware', status: 'backlog', priority: 'high', labels: ['backend'], storyPoints: 3, acceptanceCriteria: 'Server runs on port 5000', assignee: '', isFavorite: false },
-      { title: 'Set up MongoDB connection', description: 'Configure Mongoose and database connection', status: 'backlog', priority: 'high', labels: ['backend', 'database'], storyPoints: 2, acceptanceCriteria: 'DB connects successfully', assignee: '', isFavorite: false },
-      { title: 'Create React app with Vite', description: 'Initialize frontend with React + Vite', status: 'backlog', priority: 'high', labels: ['frontend'], storyPoints: 2, acceptanceCriteria: 'App renders without errors', assignee: '', isFavorite: false },
-      { title: 'JWT Authentication middleware', description: 'Implement login, register, token validation', status: 'backlog', priority: 'critical', labels: ['backend', 'auth'], storyPoints: 5, acceptanceCriteria: 'Users can register/login with tokens', assignee: '', isFavorite: false },
-      { title: 'Responsive dashboard UI', description: 'Build main dashboard with data tables', status: 'backlog', priority: 'medium', labels: ['frontend', 'ui'], storyPoints: 5, acceptanceCriteria: 'Dashboard renders data from API', assignee: '', isFavorite: false },
-      { title: 'Docker + CI/CD pipeline', description: 'Containerize app and add GitHub Actions', status: 'backlog', priority: 'medium', labels: ['deployment'], storyPoints: 5, acceptanceCriteria: 'App deploys on push to main', assignee: '', isFavorite: false },
-    ],
-    defaultSnippets: [
-      { title: 'Express App Entry', language: 'javascript', description: 'Basic Express server bootstrap', tags: ['backend', 'server'], code: `const express = require('express');\nconst cors = require('cors');\nconst app = express();\n\napp.use(cors());\napp.use(express.json());\n\napp.listen(5000, () => console.log('Server running on port 5000'));` },
-      { title: 'Mongoose Connect', language: 'javascript', description: 'MongoDB connection helper', tags: ['database', 'mongodb'], code: `const mongoose = require('mongoose');\n\nexport async function connectDB() {\n  await mongoose.connect(process.env.MONGO_URI);\n  console.log('MongoDB connected');\n}` },
-    ],
+    id: 'startup-mvp',
+    name: 'Startup MVP',
+    description: 'Minimum Viable Product starter with user auth, database, landing page, and payment integrations.',
+    icon: '◈',
+    color: '#FFE58F',
+    category: 'Startup & Product',
+    difficulty: 'advanced',
+    setupTime: '~5 min',
+    estimatedDuration: '1-3 months',
+    audience: 'Founders, Indie Hackers',
+    tags: ['SaaS', 'MVP', 'Stripe', 'Auth', 'Database'],
+    recommendedStack: ['Next.js', 'Tailwind CSS', 'PostgreSQL', 'Stripe', 'Supabase'],
+    useCases: ['Validate business idea', 'Launch landing page & product', 'Collect feedback & payments'],
+    requirements: ['Stripe developer account', 'Hosting platform (Vercel/Render)'],
+    folderStructure: '/src\n  /components\n  /pages\n  /services\n  /db\n  /hooks',
+    featured: true,
+    official: true,
+    generatedTasks: 40,
+    generatedSprints: 4,
+    generatedDocs: 3,
+    generatedAssets: 0,
+    generatedSnippets: 2,
   },
   {
-    id: 'react-app',
-    name: 'React SPA',
-    description: 'Modern React single-page application with component library, routing, and state management.',
-    icon: '⚛️',
-    color: '#38BDF8',
-    category: 'Development',
-    setupTime: '~2 min',
-    audience: 'Frontend developers',
-    features: ['Component library setup', '3 sprints', 'State management docs', 'Testing tasks'],
-    planningItems: [
-      { title: 'Vision', content: '## Vision\nBuild a fast, modern React SPA.', order: 0 },
-      { title: 'Component Architecture', content: '## Components\n- Atoms\n- Molecules\n- Organisms\n- Pages', order: 1 },
-    ],
-    sprintNames: ['Foundation & Routing', 'Core Features', 'Testing & Polish'],
-    labels: ['react', 'ui', 'components', 'state', 'testing', 'a11y'],
-    defaultDocs: [
-      { title: 'Component Library', content: '# Component Library\n\nAll shared UI components live in `src/components/`.' },
-      { title: 'State Management Guide', content: '# State Management\n\nUsing Zustand for global state.' },
-    ],
-    sampleTasks: [
-      { title: 'Set up routing with React Router', status: 'backlog', priority: 'high', labels: ['react'], storyPoints: 2, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Design token system (CSS variables)', status: 'backlog', priority: 'high', labels: ['ui'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Build navigation layout', status: 'backlog', priority: 'medium', labels: ['ui', 'components'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Set up Vitest unit tests', status: 'backlog', priority: 'medium', labels: ['testing'], storyPoints: 2, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
-    defaultSnippets: [
-      { title: 'useLocalStorage Hook', language: 'typescript', description: 'Sync state to localStorage', tags: ['hooks', 'state'], code: `import { useState } from 'react';\n\nexport function useLocalStorage<T>(key: string, initial: T) {\n  const [value, setValue] = useState<T>(() => {\n    try { return JSON.parse(localStorage.getItem(key)!) ?? initial; }\n    catch { return initial; }\n  });\n  const set = (v: T) => { setValue(v); localStorage.setItem(key, JSON.stringify(v)); };\n  return [value, set] as const;\n}` },
-    ],
+    id: 'mern-stack-app',
+    name: 'MERN Stack App',
+    description: 'Full-stack MongoDB, Express, React, and Node.js starter template for database-driven applications.',
+    icon: '✦',
+    color: '#60A5FA',
+    category: 'Software Development',
+    difficulty: 'intermediate',
+    setupTime: '~3 min',
+    estimatedDuration: '1-2 months',
+    audience: 'Full-stack developers',
+    tags: ['MERN', 'Node', 'Express', 'React', 'MongoDB'],
+    recommendedStack: ['MongoDB', 'Express.js', 'React.js', 'Node.js', 'Vite'],
+    useCases: ['Build dashboard web apps', 'Create REST APIs with frontend', 'Learn fullstack dev'],
+    requirements: ['Node.js 18+', 'MongoDB local or Atlas account'],
+    folderStructure: '/client\n  /src\n/server\n  /routes\n  /models\n  /controllers',
+    featured: true,
+    official: true,
+    generatedTasks: 35,
+    generatedSprints: 4,
+    generatedDocs: 2,
+    generatedAssets: 0,
+    generatedSnippets: 2,
   },
   {
     id: 'nextjs-saas',
     name: 'Next.js SaaS',
-    description: 'Production-ready SaaS application with auth, billing, dashboard, and multi-tenancy.',
-    icon: '💎',
+    description: 'Production-ready software-as-a-service template with billing, authentication, dashboard, and marketing page.',
+    icon: '❖',
     color: '#A78BFA',
-    category: 'Development',
+    category: 'Startup & Product',
+    difficulty: 'advanced',
     setupTime: '~4 min',
-    audience: 'Indie hackers, SaaS founders',
-    features: ['Auth & billing sprints', 'Multi-tenant docs', 'Stripe tasks', 'Landing page tasks', '6 sprints'],
-    planningItems: [
-      { title: 'Vision', content: '## Vision\nLaunch a profitable SaaS product.', order: 0 },
-      { title: 'Revenue Model', content: '## Pricing\n- Free tier\n- Pro: $29/mo\n- Team: $99/mo', order: 1 },
-      { title: 'Architecture', content: '## Stack\n- Next.js 14 (App Router)\n- Prisma + PostgreSQL\n- Stripe Billing\n- Clerk Auth', order: 2 },
-    ],
-    sprintNames: ['Project Setup', 'Auth & Onboarding', 'Core Product', 'Billing & Plans', 'Dashboard & Analytics', 'Launch'],
-    labels: ['auth', 'billing', 'dashboard', 'landing', 'api', 'database', 'email', 'admin'],
-    defaultDocs: [
-      { title: 'Architecture Overview', content: '# Architecture\n\nNext.js App Router + Prisma ORM + PostgreSQL + Stripe + Clerk.' },
-      { title: 'Stripe Integration Guide', content: '# Stripe Setup\n\n1. Create products in Stripe dashboard\n2. Set webhook endpoint to `/api/webhooks/stripe`\n3. Handle `checkout.session.completed` event' },
-    ],
-    sampleTasks: [
-      { title: 'Configure Clerk Auth', status: 'backlog', priority: 'critical', labels: ['auth'], storyPoints: 3, description: 'Set up Clerk with email + OAuth providers', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Database schema with Prisma', status: 'backlog', priority: 'high', labels: ['database'], storyPoints: 5, description: 'Define User, Organization, Subscription models', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Stripe checkout flow', status: 'backlog', priority: 'high', labels: ['billing'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Landing page with hero section', status: 'backlog', priority: 'medium', labels: ['landing'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Admin dashboard', status: 'backlog', priority: 'medium', labels: ['dashboard', 'admin'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
+    estimatedDuration: '2-3 months',
+    audience: 'SaaS founders, Indie hackers',
+    tags: ['Next.js', 'SaaS', 'Stripe', 'Tailwind', 'Prisma'],
+    recommendedStack: ['Next.js 14 App Router', 'Prisma ORM', 'Stripe', 'Tailwind CSS', 'NextAuth'],
+    useCases: ['Launch B2B SaaS', 'Build subscription portal', 'Create dashboard frontend'],
+    requirements: ['Node.js 18+', 'PostgreSQL database', 'Stripe Keys'],
+    folderStructure: '/app\n  /api\n  /dashboard\n/components\n/lib\n/prisma',
+    featured: true,
+    official: true,
+    generatedTasks: 42,
+    generatedSprints: 5,
+    generatedDocs: 3,
+    generatedAssets: 0,
+    generatedSnippets: 3,
   },
   {
-    id: 'python-api',
-    name: 'Python REST API',
-    description: 'FastAPI or Django REST Framework backend with PostgreSQL, authentication, and deployment.',
-    icon: '🐍',
-    color: '#4ADE80',
-    category: 'Development',
-    setupTime: '~2 min',
-    audience: 'Backend developers',
-    features: ['FastAPI / Django setup', '4 sprints', 'API docs', 'Auth tasks', 'Docker deployment'],
-    planningItems: [
-      { title: 'API Design', content: '## Endpoints\n- `GET /api/v1/users`\n- `POST /api/v1/auth/token`', order: 0 },
-    ],
-    sprintNames: ['Setup & Auth', 'Core Endpoints', 'Testing & Docs', 'Deployment'],
-    labels: ['python', 'api', 'auth', 'database', 'testing', 'docker'],
-    defaultDocs: [
-      { title: 'API Reference', content: '# API Reference\n\nBase URL: `https://api.yourdomain.com/v1`\n\nAll endpoints require `Authorization: Bearer <token>`' },
-    ],
-    sampleTasks: [
-      { title: 'Initialize FastAPI project', status: 'backlog', priority: 'high', labels: ['python'], storyPoints: 2, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'JWT auth with OAuth2PasswordBearer', status: 'backlog', priority: 'critical', labels: ['auth'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'PostgreSQL with SQLAlchemy ORM', status: 'backlog', priority: 'high', labels: ['database'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Pytest test suite', status: 'backlog', priority: 'medium', labels: ['testing'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
-    defaultSnippets: [
-      { title: 'FastAPI Main', language: 'python', description: 'FastAPI app entry point', tags: ['fastapi', 'python'], code: `from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI(title="My API", version="1.0.0")\n\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=["*"],\n    allow_methods=["*"],\n    allow_headers=["*"],\n)\n\n@app.get("/health")\ndef health(): return {"status": "ok"}` },
-    ],
-  },
-  {
-    id: 'mobile-app',
-    name: 'React Native App',
-    description: 'Cross-platform mobile app for iOS and Android using React Native + Expo.',
-    icon: '📱',
-    color: '#FB923C',
-    category: 'Development',
+    id: 'ai-assistant',
+    name: 'AI Assistant',
+    description: 'Conversational assistant wrapper with voice processing, prompt engineering templates, and session memory.',
+    icon: '⌬',
+    color: '#34D399',
+    category: 'Artificial Intelligence',
+    difficulty: 'intermediate',
     setupTime: '~3 min',
-    audience: 'Mobile developers',
-    features: ['Expo setup', 'Navigation sprints', 'Push notifications tasks', 'App store tasks', '5 sprints'],
-    planningItems: [
-      { title: 'App Architecture', content: '## Stack\n- React Native + Expo\n- React Navigation\n- Zustand state\n- Supabase backend', order: 0 },
-    ],
-    sprintNames: ['Setup & Navigation', 'Core Screens', 'Notifications & Deep Links', 'Performance', 'App Store Submission'],
-    labels: ['mobile', 'ios', 'android', 'navigation', 'notifications', 'performance'],
-    defaultDocs: [
-      { title: 'App Architecture', content: '# React Native Architecture\n\nUsing Expo managed workflow with EAS Build for distribution.' },
-    ],
-    sampleTasks: [
-      { title: 'Initialize Expo project', status: 'backlog', priority: 'high', labels: ['mobile'], storyPoints: 1, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Set up React Navigation stack', status: 'backlog', priority: 'high', labels: ['navigation'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Configure push notifications (Expo)', status: 'backlog', priority: 'medium', labels: ['notifications'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
-  },
-
-  // ── AI & ML ─────────────────────────────────────────────────────────────────
-  {
-    id: 'ml-pipeline',
-    name: 'ML Pipeline',
-    description: 'End-to-end machine learning pipeline: data ingestion, feature engineering, training, evaluation, and deployment.',
-    icon: '🤖',
-    color: '#F472B6',
-    category: 'AI & ML',
-    setupTime: '~4 min',
-    audience: 'Data scientists, ML engineers',
-    features: ['5 ML phases', 'Experiment tracking', 'Model docs', 'MLOps tasks', 'Jupyter notebooks'],
-    planningItems: [
-      { title: 'Problem Definition', content: '## Problem\n- Type: Classification / Regression / Clustering\n- Target metric: Accuracy / F1 / RMSE\n- Baseline model:', order: 0 },
-      { title: 'Data Sources', content: '## Data\n- Source:\n- Format:\n- Size:\n- Privacy level:', order: 1 },
-    ],
-    sprintNames: ['Data Collection', 'EDA & Feature Engineering', 'Model Training', 'Evaluation & Tuning', 'MLOps & Deployment'],
-    labels: ['data', 'eda', 'feature-engineering', 'training', 'evaluation', 'deployment', 'mlops'],
-    defaultDocs: [
-      { title: 'Experiment Log', content: '# Experiment Log\n\n| Run | Model | Params | Accuracy | Notes |\n|-----|-------|--------|----------|-------|\n| 1 | Baseline | - | - | - |' },
-      { title: 'Model Card', content: '# Model Card\n\n## Overview\n- **Model type**:\n- **Task**:\n- **Training data**:\n- **Limitations**:' },
-    ],
-    sampleTasks: [
-      { title: 'Data collection & ingestion pipeline', status: 'backlog', priority: 'high', labels: ['data'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Exploratory data analysis (EDA)', status: 'backlog', priority: 'high', labels: ['eda'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Feature engineering & preprocessing', status: 'backlog', priority: 'high', labels: ['feature-engineering'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Train baseline model', status: 'backlog', priority: 'high', labels: ['training'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Hyperparameter tuning', status: 'backlog', priority: 'medium', labels: ['training', 'evaluation'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Deploy model with FastAPI', status: 'backlog', priority: 'medium', labels: ['deployment', 'mlops'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
+    estimatedDuration: '2-4 weeks',
+    audience: 'AI Developers, hobbyists',
+    tags: ['LLM', 'AI', 'OpenAI', 'Memory', 'Voice'],
+    recommendedStack: ['OpenAI API', 'LangChain', 'React.js', 'Vite', 'Node.js'],
+    useCases: ['Build chatbot wrappers', 'Create voice notes transcriber', 'Add AI support helper'],
+    requirements: ['OpenAI API Key', 'Node.js 18+'],
+    folderStructure: '/src\n  /components\n  /ai-engine\n  /hooks\n  /types',
+    featured: true,
+    official: true,
+    generatedTasks: 30,
+    generatedSprints: 3,
+    generatedDocs: 2,
+    generatedAssets: 0,
+    generatedSnippets: 1,
   },
   {
-    id: 'llm-product',
+    id: 'llm-application',
     name: 'LLM Application',
-    description: 'AI-powered product built on top of GPT-4, Claude, or Gemini with RAG, streaming, and evaluation.',
-    icon: '🧠',
-    color: '#818CF8',
-    category: 'AI & ML',
-    setupTime: '~3 min',
-    audience: 'AI product builders',
-    features: ['RAG pipeline tasks', 'Prompt library', 'Evaluation framework', 'API integration', '5 sprints'],
-    planningItems: [
-      { title: 'Vision', content: '## Vision\nBuild an LLM-powered product that saves users significant time.', order: 0 },
-      { title: 'Model Selection', content: '## Models\n- Primary: GPT-4o / Claude 3.5 / Gemini 1.5\n- Embedding: text-embedding-3-small\n- Vector DB: Pinecone / Chroma', order: 1 },
-    ],
-    sprintNames: ['Architecture & API Setup', 'Prompt Engineering', 'RAG Pipeline', 'UI & UX', 'Evals & Launch'],
-    labels: ['llm', 'rag', 'prompts', 'embeddings', 'streaming', 'eval'],
-    defaultDocs: [
-      { title: 'Prompt Library', content: '# Prompt Library\n\n## System Prompts\n\n### Assistant Prompt\n```\nYou are a helpful assistant...\n```' },
-      { title: 'RAG Architecture', content: '# RAG Architecture\n\n1. **Ingestion**: Chunk docs → embed → store in vector DB\n2. **Retrieval**: Embed query → similarity search → top-k docs\n3. **Generation**: Build prompt with context → stream response' },
-    ],
-    sampleTasks: [
-      { title: 'OpenAI SDK setup + streaming', status: 'backlog', priority: 'high', labels: ['llm'], storyPoints: 2, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Document ingestion pipeline', status: 'backlog', priority: 'high', labels: ['rag', 'embeddings'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Vector database setup (Pinecone)', status: 'backlog', priority: 'high', labels: ['rag'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Prompt template system', status: 'backlog', priority: 'medium', labels: ['prompts'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'LLM evaluation framework', status: 'backlog', priority: 'medium', labels: ['eval'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
-    defaultSnippets: [
-      { title: 'OpenAI Streaming', language: 'typescript', description: 'Stream chat completion from OpenAI', tags: ['openai', 'streaming'], code: `import OpenAI from 'openai';\n\nconst client = new OpenAI();\n\nasync function streamChat(messages: OpenAI.Chat.ChatCompletionMessageParam[]) {\n  const stream = await client.chat.completions.create({\n    model: 'gpt-4o',\n    messages,\n    stream: true,\n  });\n  for await (const chunk of stream) {\n    process.stdout.write(chunk.choices[0]?.delta?.content ?? '');\n  }\n}` },
-    ],
+    description: 'RAG-ready large language model application with vector search, embeddings processing, and prompt caching.',
+    icon: '⬢',
+    color: '#F472B6',
+    category: 'Artificial Intelligence',
+    difficulty: 'advanced',
+    setupTime: '~5 min',
+    estimatedDuration: '1-3 months',
+    audience: 'AI Engineers, researchers',
+    tags: ['LLM', 'RAG', 'VectorDB', 'Pinecone', 'Embeddings'],
+    recommendedStack: ['Python', 'FastAPI', 'Pinecone', 'LangChain', 'OpenAI / Anthropic'],
+    useCases: ['Internal company wiki search', 'Automate docs Q&A', 'Intelligent search engines'],
+    requirements: ['Pinecone API Key', 'OpenAI API Key', 'Python 3.10+'],
+    folderStructure: '/app\n  /api\n  /vector_store\n  /embeddings\n/tests',
+    featured: true,
+    official: true,
+    generatedTasks: 38,
+    generatedSprints: 4,
+    generatedDocs: 3,
+    generatedAssets: 0,
+    generatedSnippets: 2,
   },
-
-  // ── STARTUP ──────────────────────────────────────────────────────────────────
-  {
-    id: 'mvp-launch',
-    name: 'MVP Launch',
-    description: 'Zero-to-launch plan for a startup MVP in 6 weeks with lean validation, build, and growth phases.',
-    icon: '🚀',
-    color: '#F06277',
-    category: 'Startup',
-    setupTime: '~3 min',
-    audience: 'Founders, indie hackers',
-    features: ['6 week plan', 'Validation tasks', 'GTM strategy', 'Growth experiments', 'OKR tracking'],
-    planningItems: [
-      { title: 'Problem Statement', content: '## Problem\n**Who**: \n**Pain**: \n**Current solution**: \n**Our approach**: ', order: 0 },
-      { title: 'OKRs', content: '## Q1 OKRs\n**Objective**: Launch MVP and validate product-market fit\n\n**KR1**: 100 sign-ups in first month\n**KR2**: 30% D7 retention\n**KR3**: $1k MRR', order: 1 },
-      { title: 'GTM Strategy', content: '## Go-To-Market\n\n### Channels\n- Product Hunt launch\n- Twitter/X audience\n- Niche communities (Reddit, Discord)\n\n### Messaging\nTagline: ', order: 2 },
-    ],
-    sprintNames: ['Validate & Research', 'Build Core', 'Internal Alpha', 'Beta Launch', 'Growth & Iterate', 'Scale'],
-    labels: ['validation', 'core', 'gtm', 'growth', 'retention', 'analytics'],
-    defaultDocs: [
-      { title: 'Lean Canvas', content: '# Lean Canvas\n\n| Problem | Solution | Unique Value Prop |\n|---------|----------|-------------------|\n| | | |\n\n| Customer Segments | Channels | Revenue Streams |\n|-------------------|----------|------------------|\n| | | |' },
-      { title: 'User Research Notes', content: '# User Research\n\n## Interviews\n\n### Interview 1\n- **Name**:\n- **Role**:\n- **Key insights**:' },
-    ],
-    sampleTasks: [
-      { title: '10 user discovery interviews', status: 'backlog', priority: 'critical', labels: ['validation'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Build core feature v1', status: 'backlog', priority: 'high', labels: ['core'], storyPoints: 13, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Analytics & funnel tracking', status: 'backlog', priority: 'high', labels: ['analytics'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Product Hunt launch assets', status: 'backlog', priority: 'medium', labels: ['gtm'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Email drip sequence (onboarding)', status: 'backlog', priority: 'medium', labels: ['retention'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'A/B test landing page headline', status: 'backlog', priority: 'low', labels: ['growth'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
-  },
-  {
-    id: 'product-roadmap',
-    name: 'Product Roadmap',
-    description: 'Strategic product planning with roadmap, PRDs, feature prioritization, and stakeholder docs.',
-    icon: '🗺️',
-    color: '#FACC15',
-    category: 'Startup',
-    setupTime: '~2 min',
-    audience: 'Product managers',
-    features: ['Quarterly roadmap', 'PRD templates', 'Feature scoring', 'Stakeholder updates', '4 quarters'],
-    planningItems: [
-      { title: 'Product Vision', content: '## Product Vision\n\nIn 3 years, [Product] will be...', order: 0 },
-      { title: 'Now / Next / Later', content: '## Now\n- \n\n## Next\n- \n\n## Later\n- ', order: 1 },
-    ],
-    sprintNames: ['Q1 — Foundation', 'Q2 — Growth', 'Q3 — Scale', 'Q4 — Optimize'],
-    labels: ['prd', 'research', 'design', 'engineering', 'stakeholder', 'metrics'],
-    defaultDocs: [
-      { title: 'Product Requirements Doc (PRD)', content: '# PRD Template\n\n## Problem Statement\n\n## Goals\n\n## Non-Goals\n\n## User Stories\n\n## Success Metrics' },
-      { title: 'Feature Prioritization Matrix', content: '# Feature Scoring\n\n| Feature | Impact | Effort | Score |\n|---------|--------|--------|-------|\n| | High | Low | 9 |' },
-    ],
-    sampleTasks: [
-      { title: 'Quarterly OKR planning session', status: 'backlog', priority: 'high', labels: ['metrics'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Write PRDs for top 3 features', status: 'backlog', priority: 'high', labels: ['prd'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'User research synthesis', status: 'backlog', priority: 'medium', labels: ['research'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
-  },
-
-  // ── ENTERPRISE ───────────────────────────────────────────────────────────────
   {
     id: 'enterprise-platform',
     name: 'Enterprise Platform',
-    description: 'Large-scale enterprise application with SSO, RBAC, audit logging, compliance, and SLA docs.',
-    icon: '🏗️',
-    color: '#6B7280',
-    category: 'Enterprise',
-    setupTime: '~5 min',
-    audience: 'Enterprise engineering teams',
-    features: ['SSO & RBAC', 'Compliance docs', 'SLA templates', 'Audit logging', '8 sprints'],
-    planningItems: [
-      { title: 'Architecture Decision Records', content: '# ADRs\n\n## ADR-001: Authentication\n**Status**: Accepted\n**Decision**: Use SAML 2.0 SSO', order: 0 },
-      { title: 'Security & Compliance', content: '# Security\n\n- SOC 2 Type II controls\n- GDPR data mapping\n- Pen test schedule', order: 1 },
-    ],
-    sprintNames: ['Discovery & Architecture', 'Auth & SSO', 'Core Platform', 'RBAC & Permissions', 'Integrations', 'Performance', 'Security Audit', 'Launch'],
-    labels: ['auth', 'rbac', 'compliance', 'security', 'integration', 'performance', 'audit', 'sla'],
-    defaultDocs: [
-      { title: 'SLA Definition', content: '# Service Level Agreement\n\n- **Uptime**: 99.9%\n- **RTO**: 4 hours\n- **RPO**: 1 hour' },
-      { title: 'Security Runbook', content: '# Security Runbook\n\n## Incident Response\n1. Detect\n2. Contain\n3. Eradicate\n4. Recover\n5. Post-mortem' },
-    ],
-    sampleTasks: [
-      { title: 'SAML 2.0 SSO integration', status: 'backlog', priority: 'critical', labels: ['auth'], storyPoints: 13, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'RBAC system with role hierarchy', status: 'backlog', priority: 'high', labels: ['rbac'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Audit logging system', status: 'backlog', priority: 'high', labels: ['audit'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'GDPR compliance review', status: 'backlog', priority: 'high', labels: ['compliance'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
+    description: 'Monorepo architecture with high test coverage, RBAC permissions system, and infrastructure configs.',
+    icon: '⬡',
+    color: '#FB923C',
+    category: 'Software Development',
+    difficulty: 'advanced',
+    setupTime: '~8 min',
+    estimatedDuration: '3-6 months',
+    audience: 'Enterprise teams',
+    tags: ['Enterprise', 'Monorepo', 'Turborepo', 'RBAC', 'Docker'],
+    recommendedStack: ['TypeScript', 'Turborepo', 'Next.js', 'NestJS', 'Docker', 'Kubernetes'],
+    useCases: ['Build enterprise multi-service webapps', 'Standardize team developer repository structure'],
+    requirements: ['Docker', 'Kubernetes local cluster', 'Node.js 20+'],
+    folderStructure: '/apps\n  /web\n  /api\n/packages\n  /ui\n  /config\n  /db',
+    featured: true,
+    official: true,
+    generatedTasks: 45,
+    generatedSprints: 6,
+    generatedDocs: 4,
+    generatedAssets: 0,
+    generatedSnippets: 3,
   },
-
-  // ── DESIGN ───────────────────────────────────────────────────────────────────
-  {
-    id: 'design-system',
-    name: 'Design System',
-    description: 'Complete design system with component library, tokens, Storybook, and accessibility guidelines.',
-    icon: '🎨',
-    color: '#F472B6',
-    category: 'Design',
-    setupTime: '~3 min',
-    audience: 'Design & frontend teams',
-    features: ['Token system', 'Storybook setup', 'Accessibility docs', 'Component library', '5 sprints'],
-    planningItems: [
-      { title: 'Design Principles', content: '## Principles\n1. Clarity\n2. Consistency\n3. Delight\n4. Accessibility', order: 0 },
-      { title: 'Token Architecture', content: '## Tokens\n- Primitive tokens (colors, spacing)\n- Semantic tokens (--color-primary)\n- Component tokens', order: 1 },
-    ],
-    sprintNames: ['Foundation & Tokens', 'Core Components', 'Complex Components', 'Storybook & Docs', 'Accessibility Audit'],
-    labels: ['tokens', 'components', 'storybook', 'a11y', 'typography', 'icons'],
-    defaultDocs: [
-      { title: 'Color System', content: '# Color System\n\n## Brand Colors\n- Primary: #\n- Secondary: #\n\n## Semantic Colors\n- Success: #\n- Error: #\n- Warning: #' },
-      { title: 'Component Checklist', content: '# Component Checklist\n\nBefore shipping a component:\n- [ ] Variants documented\n- [ ] Keyboard accessible\n- [ ] Screen reader tested\n- [ ] Storybook stories added' },
-    ],
-    sampleTasks: [
-      { title: 'Define design token system', status: 'backlog', priority: 'critical', labels: ['tokens'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Build Button component (all variants)', status: 'backlog', priority: 'high', labels: ['components'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Set up Storybook 8', status: 'backlog', priority: 'high', labels: ['storybook'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'WCAG 2.1 AA audit', status: 'backlog', priority: 'medium', labels: ['a11y'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
-  },
-  {
-    id: 'product-redesign',
-    name: 'Product Redesign',
-    description: 'Full UX/UI redesign sprint with user research, wireframes, prototypes, and handoff to engineering.',
-    icon: '✏️',
-    color: '#C084FC',
-    category: 'Design',
-    setupTime: '~2 min',
-    audience: 'UX/UI designers, product teams',
-    features: ['Research phase', 'Wireframing sprints', 'User testing tasks', 'Figma handoff', '4 sprints'],
-    planningItems: [
-      { title: 'Design Brief', content: '## Design Brief\n\n**Project**: \n**Goals**: \n**Timeline**: \n**Stakeholders**: ', order: 0 },
-    ],
-    sprintNames: ['User Research', 'Wireframes & Information Architecture', 'High-Fidelity Design', 'Prototype & Test'],
-    labels: ['research', 'wireframes', 'ui', 'prototype', 'testing', 'handoff'],
-    defaultDocs: [
-      { title: 'UX Research Plan', content: '# UX Research Plan\n\n## Methods\n- Usability testing (5 participants)\n- Card sorting\n- A/B testing\n\n## Key questions\n1. \n2. ' },
-    ],
-    sampleTasks: [
-      { title: '5 usability testing sessions', status: 'backlog', priority: 'high', labels: ['research', 'testing'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Competitive analysis (10 products)', status: 'backlog', priority: 'high', labels: ['research'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Mobile wireframes (30 screens)', status: 'backlog', priority: 'high', labels: ['wireframes'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Interactive Figma prototype', status: 'backlog', priority: 'medium', labels: ['prototype'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
-  },
-
-  // ── EDUCATION ────────────────────────────────────────────────────────────────
-  {
-    id: 'online-course',
-    name: 'Online Course',
-    description: 'Plan, produce, and launch an online course with curriculum design, video production, and marketing.',
-    icon: '📚',
-    color: '#34D399',
-    category: 'Education',
-    setupTime: '~2 min',
-    audience: 'Course creators, educators',
-    features: ['Curriculum planning', 'Production sprints', 'Launch tasks', 'Student feedback', '4 sprints'],
-    planningItems: [
-      { title: 'Course Outline', content: '## Course Outline\n\n### Module 1: \n- Lesson 1:\n- Lesson 2:\n\n### Module 2:', order: 0 },
-    ],
-    sprintNames: ['Curriculum Design', 'Video Production', 'Platform Setup', 'Launch & Marketing'],
-    labels: ['curriculum', 'video', 'platform', 'marketing', 'students', 'feedback'],
-    defaultDocs: [
-      { title: 'Curriculum Map', content: '# Curriculum Map\n\n| Module | Title | Duration | Outcomes |\n|--------|-------|----------|----------|\n| 1 | | | |' },
-    ],
-    sampleTasks: [
-      { title: 'Define learning outcomes per module', status: 'backlog', priority: 'high', labels: ['curriculum'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Record 10 lesson videos', status: 'backlog', priority: 'high', labels: ['video'], storyPoints: 13, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Upload to Teachable / Gumroad', status: 'backlog', priority: 'medium', labels: ['platform'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Email launch sequence (7 emails)', status: 'backlog', priority: 'medium', labels: ['marketing'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
-  },
-
-  // ── OPEN SOURCE ──────────────────────────────────────────────────────────────
-  {
-    id: 'open-source-lib',
-    name: 'Open Source Library',
-    description: 'Build and release an open source library with documentation site, CI/CD, and community guidelines.',
-    icon: '📦',
-    color: '#F59E0B',
-    category: 'Open Source',
-    setupTime: '~3 min',
-    audience: 'OSS maintainers, library authors',
-    features: ['npm publish pipeline', 'Docs site', 'Contributing guide', 'Semver tasks', '5 sprints'],
-    planningItems: [
-      { title: 'Library Scope', content: '## What This Library Does\n\n- Primary use case:\n- Target environment: Node.js / Browser / Both\n- Key APIs:', order: 0 },
-      { title: 'Community Guidelines', content: '## Community\n\n- Code of Conduct: Contributor Covenant\n- Issue templates\n- PR template', order: 1 },
-    ],
-    sprintNames: ['API Design', 'Core Implementation', 'Testing & Edge Cases', 'Documentation Site', 'v1.0 Release'],
-    labels: ['api', 'core', 'testing', 'docs', 'release', 'community'],
-    defaultDocs: [
-      { title: 'API Reference', content: '# API Reference\n\n## Installation\n```bash\nnpm install my-lib\n```\n\n## Usage\n```js\nimport { myLib } from "my-lib";\n```' },
-      { title: 'Contributing Guide', content: '# Contributing\n\n1. Fork the repo\n2. Create your feature branch\n3. Run tests: `npm test`\n4. Submit a PR' },
-    ],
-    sampleTasks: [
-      { title: 'Design public API surface', status: 'backlog', priority: 'critical', labels: ['api'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'TypeScript typings + JSDoc', status: 'backlog', priority: 'high', labels: ['core'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: '100% test coverage', status: 'backlog', priority: 'high', labels: ['testing'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Docusaurus documentation site', status: 'backlog', priority: 'medium', labels: ['docs'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Automated npm publish with GitHub Actions', status: 'backlog', priority: 'medium', labels: ['release'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
-    defaultSnippets: [
-      { title: 'GitHub Actions Release', language: 'yaml', description: 'Auto-publish to npm on tag push', tags: ['ci', 'npm'], code: `name: Release\non:\n  push:\n    tags: ['v*']\njobs:\n  publish:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 20\n          registry-url: 'https://registry.npmjs.org'\n      - run: npm ci\n      - run: npm test\n      - run: npm publish\n        env:\n          NODE_AUTH_TOKEN: \${{ secrets.NPM_TOKEN }}` },
-    ],
-  },
-
-  // ── PERSONAL ──────────────────────────────────────────────────────────────────
   {
     id: 'personal-portfolio',
     name: 'Personal Portfolio',
-    description: 'Build a stunning developer portfolio with projects showcase, blog, and contact form.',
-    icon: '🌟',
-    color: '#818CF8',
+    description: 'Elegant, high-performance portfolio to showcase developer projects, blog post feeds, and resume details.',
+    icon: '⚙',
+    color: '#38BDF8',
     category: 'Personal',
+    difficulty: 'beginner',
     setupTime: '~2 min',
-    audience: 'Developers, designers',
-    features: ['Portfolio design sprints', 'Blog setup', 'SEO optimization', 'Domain setup', '3 sprints'],
-    planningItems: [
-      { title: 'Content Plan', content: '## Sections\n- Hero\n- About\n- Projects (6)\n- Skills\n- Blog\n- Contact', order: 0 },
-    ],
-    sprintNames: ['Design & Structure', 'Content & Projects', 'SEO & Launch'],
-    labels: ['design', 'content', 'seo', 'blog', 'projects', 'performance'],
-    defaultDocs: [
-      { title: 'Project Showcase List', content: '# Projects to Showcase\n\n| Project | Description | Tech Stack | Link |\n|---------|-------------|------------|------|\n| | | | |' },
-    ],
-    sampleTasks: [
-      { title: 'Design hero section with animations', status: 'backlog', priority: 'high', labels: ['design'], storyPoints: 5, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Write 3 case study pages', status: 'backlog', priority: 'high', labels: ['content', 'projects'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'SEO + meta tags + sitemap', status: 'backlog', priority: 'medium', labels: ['seo'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Performance audit (Lighthouse 90+)', status: 'backlog', priority: 'medium', labels: ['performance'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
-  },
-  {
-    id: 'side-project',
-    name: 'Side Project',
-    description: 'Lightweight personal project tracking with minimal overhead — just enough structure to ship.',
-    icon: '🔥',
-    color: '#F06277',
-    category: 'Personal',
-    setupTime: '~1 min',
-    audience: 'Solo developers',
-    features: ['Minimal process', '2 sprints', 'Ship fast', 'One page planning', 'Idea tracking'],
-    planningItems: [
-      { title: 'One-Page Plan', content: '## What am I building?\n\n**Problem**: \n**Solution**: \n**Target user**: \n**First version (MVP)**: \n**Definition of done**: ', order: 0 },
-    ],
-    sprintNames: ['Build', 'Launch'],
-    labels: ['core', 'ui', 'launch', 'bug', 'idea'],
-    defaultDocs: [
-      { title: 'Quick Notes', content: '# Notes\n\n## Ideas\n-\n\n## Bugs\n-\n\n## Backlog\n-' },
-    ],
-    sampleTasks: [
-      { title: 'Define MVP scope (3 features max)', status: 'backlog', priority: 'critical', labels: ['core'], storyPoints: 1, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Build and deploy v0.1', status: 'backlog', priority: 'high', labels: ['core'], storyPoints: 8, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-      { title: 'Get first 10 users', status: 'backlog', priority: 'high', labels: ['launch'], storyPoints: 3, description: '', acceptanceCriteria: '', assignee: '', isFavorite: false },
-    ],
+    estimatedDuration: '1-2 weeks',
+    audience: 'All developers, designers',
+    tags: ['Portfolio', 'Showcase', 'Blog', 'Static', 'Tailwind'],
+    recommendedStack: ['Astro', 'Tailwind CSS', 'Markdown', 'Vercel'],
+    useCases: ['Build developer portfolio', 'Host personal resume online', 'Write tech blogs'],
+    requirements: ['Basic HTML/CSS knowledge', 'GitHub account'],
+    folderStructure: '/src\n  /components\n  /content\n    /blog\n    /projects\n  /pages',
+    featured: true,
+    official: true,
+    generatedTasks: 25,
+    generatedSprints: 2,
+    generatedDocs: 2,
+    generatedAssets: 0,
+    generatedSnippets: 1,
   },
 
-  // ── BLANK ────────────────────────────────────────────────────────────────────
-  {
-    id: 'blank',
-    name: 'Blank Project',
-    description: 'Start from scratch with an empty workspace. Fully customizable.',
-    icon: '✨',
-    color: '#9CA3AF',
-    category: 'Personal',
-    setupTime: '< 1 min',
-    audience: 'Everyone',
-    features: ['Empty board', 'Default planning sections', 'No pre-built tasks'],
-    planningItems: [],
-    sprintNames: [],
-    labels: [],
-    defaultDocs: [],
-    sampleTasks: [],
-  },
+  // ── software development ──
+  { id: 'blank-project', name: 'Blank Project', description: 'Fresh empty workspace. Setup custom project structures from scratch.', icon: '◈', color: '#9CA3AF', category: 'Software Development', difficulty: 'beginner', setupTime: '< 1 min', estimatedDuration: 'Varies', audience: 'Everyone', tags: ['Custom', 'Clean'], recommendedStack: ['Any'], useCases: ['Start completely from scratch', 'Use own custom structures'], requirements: [] },
+  { id: 'react-spa', name: 'React SPA', description: 'Clean single page app setup with client-side routing and state management.', icon: '⚛', color: '#60A5FA', category: 'Software Development', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '2-4 weeks', audience: 'Frontend developers', tags: ['SPA', 'Vite', 'React', 'Zustand'], recommendedStack: ['React', 'Vite', 'Zustand', 'React Router'], useCases: ['Build lightweight clients', 'Create prototype UI tools'], requirements: ['Node.js 18+'] },
+  { id: 'node-backend', name: 'Node.js Backend', description: 'Clean Node.js API server configuration with logging, error handling, and lint rules.', icon: '⚡', color: '#34D399', category: 'Software Development', difficulty: 'intermediate', setupTime: '~2 min', estimatedDuration: '2-4 weeks', audience: 'Backend developers', tags: ['Node', 'Express', 'API', 'ESLint'], recommendedStack: ['Node.js', 'Express.js', 'Winston Logger', 'Jest'], useCases: ['Build API servers', 'Create microservices'], requirements: ['Node.js 18+'] },
+  { id: 'python-rest-api', name: 'Python REST API', description: 'FastAPI python project configured with migrations, schema verification, and database ORM.', icon: '♾', color: '#38BDF8', category: 'Software Development', difficulty: 'intermediate', setupTime: '~3 min', estimatedDuration: '3-6 weeks', audience: 'Python developers', tags: ['Python', 'FastAPI', 'SQLAlchemy', 'Pydantic'], recommendedStack: ['Python 3.10+', 'FastAPI', 'SQLAlchemy', 'Alembic', 'PostgreSQL'], useCases: ['High performance REST API servers', 'Build ML serving endpoints'], requirements: ['Python 3.10+ installed'] },
+  { id: 'aspnet-api', name: 'ASP.NET Core API', description: 'Clean architecture API workspace with EF Core, migrations, Swagger, and dependency injection patterns.', icon: '⚿', color: '#818CF8', category: 'Software Development', difficulty: 'intermediate', setupTime: '~4 min', estimatedDuration: '1-2 months', audience: '.NET developers', tags: ['.NET', 'C#', 'WebAPI', 'EFCore'], recommendedStack: ['.NET 8', 'C#', 'Entity Framework Core', 'SQL Server'], useCases: ['Enterprise C# backend systems', 'Robust web services'], requirements: ['.NET SDK 8 installed'] },
+  { id: 'spring-boot-api', name: 'Spring Boot API', description: 'Structured Java Spring Boot API workspace with JPA, security filter configs, and Maven dependency structures.', icon: '🝔', color: '#4ADE80', category: 'Software Development', difficulty: 'intermediate', setupTime: '~4 min', estimatedDuration: '1-2 months', audience: 'Java developers', tags: ['Java', 'Spring', 'JPA', 'Maven'], recommendedStack: ['Java 17', 'Spring Boot 3', 'Spring Data JPA', 'PostgreSQL'], useCases: ['Robust enterprise backend services', 'Scale backend architectures'], requirements: ['JDK 17 installed'] },
+  { id: 'graphql-api', name: 'GraphQL API', description: 'GraphQL server workspace with auto-generated types, field resolvers, and query loaders.', icon: '⚒', color: '#F472B6', category: 'Software Development', difficulty: 'intermediate', setupTime: '~3 min', estimatedDuration: '1-2 months', audience: 'API developers', tags: ['GraphQL', 'Apollo', 'Schema', 'Node'], recommendedStack: ['Apollo Server', 'GraphQL', 'TypeScript', 'Prisma'], useCases: ['Unified API hub', 'Rapid frontend query integrations'], requirements: ['Node.js 18+'] },
+  { id: 'rest-api', name: 'REST API Toolkit', description: 'API collection setup with request throttling, validation filters, API keys, and endpoint docs.', icon: '⚙', color: '#9CA3AF', category: 'Software Development', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '2-4 weeks', audience: 'All developers', tags: ['API', 'Endpoints', 'REST', 'Postman'], recommendedStack: ['Express.js', 'Swagger', 'Joi Validation'], useCases: ['Quickly build standard API microservices', 'Serve JSON formats'], requirements: ['Node.js 18+'] },
+  { id: 'microservices', name: 'Microservices Platform', description: 'Docker Compose workspace with message broker configs, gateway configs, and multi-service scripts.', icon: '❖', color: '#F87171', category: 'Software Development', difficulty: 'advanced', setupTime: '~10 min', estimatedDuration: '3-6 months', audience: 'DevOps & Systems devs', tags: ['Microservices', 'Docker', 'RabbitMQ', 'Gateway'], recommendedStack: ['Docker Compose', 'RabbitMQ', 'Express Gateway', 'Redis'], useCases: ['Distributed applications architecture', 'Realtime async queues'], requirements: ['Docker and Docker Compose installed'] },
+  { id: 'browser-extension', name: 'Browser Extension', description: 'Manifest v3 extension skeleton with background worker scripts, content scripts, and dashboard popups.', icon: '⬧', color: '#FB923C', category: 'Software Development', difficulty: 'intermediate', setupTime: '~2 min', estimatedDuration: '2-4 weeks', audience: 'Frontend developers', tags: ['Chrome', 'Extension', 'ManifestV3', 'Popup'], recommendedStack: ['React', 'Webpack', 'Manifest v3', 'CSS'], useCases: ['Chrome / Firefox user utility', 'Web screen scraper extension'], requirements: ['Node.js 18+'] },
+  { id: 'electron-desktop', name: 'Electron Desktop App', description: 'Cross-platform desktop application environment with main processes, page renderers, and builders.', icon: '◼', color: '#60A5FA', category: 'Software Development', difficulty: 'intermediate', setupTime: '~4 min', estimatedDuration: '1-2 months', audience: 'Frontend developers', tags: ['Electron', 'Desktop', 'React', 'Builder'], recommendedStack: ['Electron', 'React', 'Vite', 'Tailwind CSS'], useCases: ['Cross platform desktop application tool', 'Local file utility application'], requirements: ['Node.js 18+'] },
+  { id: 'npm-package', name: 'NPM Package Starter', description: 'Minimal TS compiler setup, lint rules, test configurations, and auto-release pipelines.', icon: '▲', color: '#E11D48', category: 'Software Development', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '1-2 weeks', audience: 'Library developers', tags: ['NPM', 'TypeScript', 'Library', 'Release'], recommendedStack: ['TypeScript', 'Vitest', 'tsup', 'GitHub Actions'], useCases: ['Publish utility libraries to npm', 'Internal package monorepos'], requirements: ['NPM account'] },
+  { id: 'react-native-app', name: 'React Native App', description: 'Mobile workspace configured with basic routes, layout assets, and native app configurations.', icon: '◆', color: '#06B6D4', category: 'Software Development', difficulty: 'intermediate', setupTime: '~5 min', estimatedDuration: '2-3 months', audience: 'Mobile developers', tags: ['React Native', 'Expo', 'iOS', 'Android'], recommendedStack: ['Expo SDK', 'React Native', 'TypeScript', 'React Navigation'], useCases: ['Build Android/iOS cross platform apps', 'Prototype mobile apps quickly'], requirements: ['Node.js 18+', 'Expo Go app on phone'] },
+  { id: 'flutter-app', name: 'Flutter Mobile App', description: 'Flutter mobile application project initialized with custom theme setups and router configurations.', icon: '●', color: '#0284C7', category: 'Software Development', difficulty: 'intermediate', setupTime: '~5 min', estimatedDuration: '2-3 months', audience: 'Mobile developers', tags: ['Flutter', 'Dart', 'Mobile', 'iOS'], recommendedStack: ['Flutter SDK', 'Dart', 'Provider State', 'GoRouter'], useCases: ['High performance native mobile applications', 'Deploy multiplatform client apps'], requirements: ['Flutter SDK installed'] },
+  { id: 'unity-game', name: 'Unity Game Starter', description: 'Unity C# project structure with preset scripts, input actions, asset folder organization, and build pipelines.', icon: '✦', color: '#374151', category: 'Software Development', difficulty: 'beginner', setupTime: '~3 min', estimatedDuration: '2-4 months', audience: 'Indie game developers', tags: ['Unity', 'GameDev', 'C#', 'Assets'], recommendedStack: ['Unity Engine', 'C#', 'Universal Render Pipeline'], useCases: ['Start 2D or 3D indie game development', 'Game jam structure setup'], requirements: ['Unity Hub & Unity Editor installed'] },
+  { id: 'unreal-game', name: 'Unreal Engine Game', description: 'C++ & Blueprint template with gameplay framework layout folders and pre-configured asset organization.', icon: '⌬', color: '#111827', category: 'Software Development', difficulty: 'advanced', setupTime: '~4 min', estimatedDuration: '3-6 months', audience: 'Game developers', tags: ['Unreal', 'GameDev', 'C++', 'Blueprint'], recommendedStack: ['Unreal Engine 5', 'C++', 'Blueprints'], useCases: ['Desktop 3D games development', 'Realistic VR/rendering platforms'], requirements: ['Unreal Engine 5 installed'] },
+  { id: 'cloud-native', name: 'Cloud Native App', description: 'Kubernetes deployment templates, Docker configurations, and multi-stage pipelines.', icon: '⚛', color: '#0EA5E9', category: 'Software Development', difficulty: 'advanced', setupTime: '~6 min', estimatedDuration: '2-4 months', audience: 'Cloud engineers', tags: ['Kubernetes', 'Helm', 'Docker', 'AWS'], recommendedStack: ['Docker', 'Kubernetes', 'Helm Chart', 'Terraform'], useCases: ['Scale modern cloud microservices', 'Define cluster infrastructure configs'], requirements: ['Docker and Kubernetes cluster access'] },
+
+  // ── artificial intelligence ──
+  { id: 'ml-pipeline', name: 'ML Pipeline', description: 'Python data science setup with scripts for training models, data cleaning, and deployment.', icon: '⚡', color: '#10B981', category: 'Artificial Intelligence', difficulty: 'intermediate', setupTime: '~3 min', estimatedDuration: '1-3 months', audience: 'Data scientists', tags: ['Python', 'Pandas', 'Scikit-Learn', 'Training'], recommendedStack: ['Python', 'Pandas', 'Scikit-Learn', 'FastAPI'], useCases: ['Build data model pipelines', 'Train custom ML models'], requirements: ['Python 3.9+'] },
+  { id: 'data-science', name: 'Data Science Project', description: 'Jupyter notebook workspaces with data analysis templates, clean plots, and regression models.', icon: '⚙', color: '#14B8A6', category: 'Artificial Intelligence', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '2-4 weeks', audience: 'Analysts, data scientists', tags: ['Jupyter', 'Pandas', 'Matplotlib', 'Analysis'], recommendedStack: ['Python', 'Jupyter Lab', 'Pandas', 'Seaborn'], useCases: ['Clean large raw dataset files', 'Generate custom charts and insight graphs'], requirements: ['Python and Jupyter installed'] },
+  { id: 'computer-vision', name: 'Computer Vision', description: 'OpenCV script templates configured with camera ingestion scripts and image classification networks.', icon: '⚿', color: '#D946EF', category: 'Artificial Intelligence', difficulty: 'advanced', setupTime: '~4 min', estimatedDuration: '1-2 months', audience: 'AI Developers', tags: ['OpenCV', 'PyTorch', 'Vision', 'YOLO'], recommendedStack: ['Python', 'OpenCV', 'PyTorch', 'FastAPI'], useCases: ['Realtime object detection scripts', 'Ingest and classify camera video streams'], requirements: ['Webcam or video input', 'Python 3.10+'] },
+  { id: 'speech-recognition', name: 'Speech Recognition', description: 'Audio processing model configuration with Whisper transcriber and audio file chunks.', icon: '🝔', color: '#6366F1', category: 'Artificial Intelligence', difficulty: 'intermediate', setupTime: '~3 min', estimatedDuration: '1-2 months', audience: 'AI Developers', tags: ['Speech', 'Whisper', 'Audio', 'Transcribe'], recommendedStack: ['Python', 'OpenAI Whisper', 'FFmpeg', 'FastAPI'], useCases: ['Transcribe voice audio files to text', 'Build conversational audio inputs'], requirements: ['FFmpeg installed locally'] },
+  { id: 'rag-application', name: 'RAG Application', description: 'Vector retrieval configuration with page loaders, vector search indexes, and document splitting utilities.', icon: '⚒', color: '#8B5CF6', category: 'Artificial Intelligence', difficulty: 'advanced', setupTime: '~5 min', estimatedDuration: '1-3 months', audience: 'AI Engineers', tags: ['RAG', 'VectorDB', 'LangChain', 'OpenAI'], recommendedStack: ['FastAPI', 'LangChain', 'ChromaDB', 'OpenAI API'], useCases: ['Intelligent question-answer tool for internal wikis', 'PDF document analysis tool'], requirements: ['OpenAI API Key'] },
+  { id: 'ai-research', name: 'AI Research Workspace', description: 'Environment setup for deep learning experiments, loss charting scripts, and GPU training config tools.', icon: '⚙', color: '#A855F7', category: 'Artificial Intelligence', difficulty: 'advanced', setupTime: '~5 min', estimatedDuration: '2-6 months', audience: 'Researchers, ML engineers', tags: ['PyTorch', 'Research', 'Training', 'GPU'], recommendedStack: ['Python', 'PyTorch', 'TensorBoard', 'Hugging Face'], useCases: ['Train neural networks from scratch', 'Experiment with transformer weights'], requirements: ['CUDA compatible GPU recommended'] },
+  { id: 'prompt-workspace', name: 'Prompt Workspace', description: 'Testing workspace to design complex prompt chains, track API tokens, and test system instructions.', icon: '❖', color: '#EC4899', category: 'Artificial Intelligence', difficulty: 'beginner', setupTime: '~1 min', estimatedDuration: '1-3 weeks', audience: 'Prompt engineers', tags: ['Prompts', 'OpenAI', 'Claude', 'JSON-Schema'], recommendedStack: ['Node.js', 'Vite', 'OpenAI Playground'], useCases: ['Draft and version prompt structures', 'Evaluate model output consistency'], requirements: [] },
+
+  // ── startup & product ──
+  { id: 'startup-validation', name: 'Startup Idea Validation', description: 'Structured plan to draft surveys, compile user interview spreadsheets, and build landing page components.', icon: '⬧', color: '#F59E0B', category: 'Startup & Product', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '2-4 weeks', audience: 'Founders', tags: ['Validation', 'Interviews', 'Market', 'Landing'], recommendedStack: ['Typeform', 'Carrd', 'Google Sheets'], useCases: ['Evaluate market demand', 'Interview 20 potential customers'], requirements: [] },
+  { id: 'saas-platform', name: 'SaaS Platform Layout', description: 'B2B subscription portal database tables, JWT auth models, billing features, and plan details.', icon: '◼', color: '#84CC16', category: 'Startup & Product', difficulty: 'advanced', setupTime: '~4 min', estimatedDuration: '2-3 months', audience: 'SaaS founders', tags: ['SaaS', 'Stripe', 'Multi-tenant', 'Portal'], recommendedStack: ['Next.js', 'Prisma', 'PostgreSQL', 'Stripe'], useCases: ['Launch recurring software services', 'Build multi-tenant platform portals'], requirements: ['Stripe developer account'] },
+  { id: 'product-roadmap', name: 'Product Roadmap Workspace', description: 'Roadmap board to track user feedback queues, feature milestones, and release checklists.', icon: '▲', color: '#06B6D4', category: 'Startup & Product', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: 'Continuous', audience: 'Product managers', tags: ['Roadmap', 'Milestones', 'Feedback', 'Releases'], recommendedStack: ['WIP Projects', 'Docs'], useCases: ['Organize team milestones', 'Public feedback tracking boards'], requirements: [] },
+  { id: 'marketplace-platform', name: 'Marketplace Starter', description: 'Multi-vendor system structure with checkout flows, buyer/seller profiles, and transaction logs.', icon: '◆', color: '#EF4444', category: 'Startup & Product', difficulty: 'advanced', setupTime: '~6 min', estimatedDuration: '2-4 months', audience: 'Founders, devs', tags: ['Marketplace', 'StripeConnect', 'Vendors', 'Transactions'], recommendedStack: ['Next.js', 'PostgreSQL', 'Stripe Connect', 'Tailwind'], useCases: ['Build peer-to-peer e-commerce apps', 'Create vendor services platform'], requirements: ['Stripe Connect account'] },
+  { id: 'crm-system', name: 'CRM Core Workspace', description: 'Customer pipeline management system with lead states, contacts tables, and task tracking pipelines.', icon: '●', color: '#3B82F6', category: 'Startup & Product', difficulty: 'intermediate', setupTime: '~3 min', estimatedDuration: '1-2 months', audience: 'SMEs, sales teams', tags: ['CRM', 'Pipeline', 'Leads', 'Sales'], recommendedStack: ['React', 'Node.js', 'PostgreSQL'], useCases: ['Build custom CRM web apps', 'Track lead conversion funnels'], requirements: [] },
+  { id: 'fintech-app', name: 'FinTech Platform Core', description: 'Double-entry ledger database schema, ledger transactions verification, and Plaid API integration setups.', icon: '✦', color: '#10B981', category: 'Startup & Product', difficulty: 'advanced', setupTime: '~6 min', estimatedDuration: '2-4 months', audience: 'Fintech developers', tags: ['FinTech', 'Plaid', 'Ledger', 'Security'], recommendedStack: ['Node.js', 'Plaid SDK', 'PostgreSQL', 'Redis'], useCases: ['Build personal finance apps', 'Integrate user bank account endpoints'], requirements: ['Plaid developer account', 'SSL certificate configured'] },
+  { id: 'e-commerce-site', name: 'E-Commerce Storefront', description: 'Catalog layout pages, shopping cart context scripts, checkout forms, and Stripe integrations.', icon: '⌬', color: '#EAB308', category: 'Startup & Product', difficulty: 'intermediate', setupTime: '~4 min', estimatedDuration: '1-2 months', audience: 'Store builders', tags: ['E-Commerce', 'Cart', 'Stripe', 'Storefront'], recommendedStack: ['Next.js', 'Stripe API', 'Tailwind CSS', 'Postgres'], useCases: ['Launch physical product store online', 'Custom checkout portal apps'], requirements: ['Stripe Account'] },
+
+  // ── design ──
+  { id: 'design-system', name: 'Design System', description: 'Tokens documentation workspace with typography scales, responsive grids, and components lists.', icon: '⚛', color: '#F43F5E', category: 'Design', difficulty: 'intermediate', setupTime: '~2 min', estimatedDuration: '3-6 weeks', audience: 'UI/UX designers, developers', tags: ['Tokens', 'Colors', 'Typography', 'Figma'], recommendedStack: ['Storybook', 'React', 'Tailwind CSS'], useCases: ['Build UI design systems', 'Define frontend style standards'], requirements: [] },
+  { id: 'ui-kit', name: 'UI Kit Components', description: 'Standard layout buttons, card containers, dialog modals, inputs, and toggle switches list.', icon: '⚡', color: '#EC4899', category: 'Design', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '2-4 weeks', audience: 'Frontend developers', tags: ['UIKit', 'Components', 'Inputs', 'React'], recommendedStack: ['React', 'CSS Modules'], useCases: ['Rapid component prototypes', 'Reusable component libraries'], requirements: [] },
+  { id: 'product-redesign', name: 'Product Redesign', description: 'Workspace to inventory user friction pages, list UX feedback items, and track redesign sprints.', icon: '⚙', color: '#D946EF', category: 'Design', difficulty: 'intermediate', setupTime: '~2 min', estimatedDuration: '1-2 months', audience: 'Product designers', tags: ['Redesign', 'UX', 'Friction', 'Mockups'], recommendedStack: ['Figma link', 'User surveys'], useCases: ['Plan application UX overhaul', 'Audit interface friction items'], requirements: [] },
+  { id: 'brand-identity', name: 'Brand Identity Blueprint', description: 'Logo assets folder layout, brand style guides, asset sizes checklists, and marketing assets.', icon: '⚿', color: '#8B5CF6', category: 'Design', difficulty: 'beginner', setupTime: '~1 min', estimatedDuration: '2-3 weeks', audience: 'Brand designers, marketing', tags: ['Brand', 'Styleguide', 'Logo', 'Marketing'], recommendedStack: ['Figma', 'Illustrator'], useCases: ['Organize brand assets', 'Write business style guides'], requirements: [] },
+  { id: 'mobile-ui-design', name: 'Mobile App Design', description: 'Mobile viewport screen checklists, screen transitions plan, and Figma embed assets workspaces.', icon: '🝔', color: '#6366F1', category: 'Design', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '3-6 weeks', audience: 'Mobile UI designers', tags: ['Mobile', 'UIUX', 'Figma', 'Prototyping'], recommendedStack: ['Figma', 'Sketch'], useCases: ['Map mobile app user flows', 'Prepare asset layouts for native dev'], requirements: [] },
+
+  // ── education ──
+  { id: 'college-project', name: 'College Project', description: 'Document thesis plans, organize reference links, track reports chapters, and code structures.', icon: '⚒', color: '#3B82F6', category: 'Education', difficulty: 'beginner', setupTime: '~1 min', estimatedDuration: '1-3 months', audience: 'Students', tags: ['College', 'Thesis', 'Report', 'Research'], recommendedStack: ['LaTeX', 'Markdown', 'Git'], useCases: ['Plan university class projects', 'Organize dissertation text drafts'], requirements: [] },
+  { id: 'capstone-project', name: 'Capstone Project', description: 'Final year capstone track with task divisions spreadsheets, milestones check, and presentation slide checklists.', icon: '⚙', color: '#10B981', category: 'Education', difficulty: 'intermediate', setupTime: '~2 min', estimatedDuration: '3-6 months', audience: 'Students, teams', tags: ['Capstone', 'Milestones', 'Report', 'Presentation'], recommendedStack: ['GitHub', 'Overleaf', 'Google Slides'], useCases: ['Track final year group projects', 'Compile capstone deliverables'], requirements: [] },
+  { id: 'assignment-tracker', name: 'Assignment Tracker', description: 'Homework priority queues, course deadlines calendars, and study logs workspace.', icon: '❖', color: '#64748B', category: 'Education', difficulty: 'beginner', setupTime: '~1 min', estimatedDuration: 'Continuous', audience: 'Students', tags: ['Homework', 'Classes', 'Deadlines', 'Study'], recommendedStack: ['WIP Tasks'], useCases: ['Organize university homework loads', 'Study scheduling planners'], requirements: [] },
+  { id: 'online-course', name: 'Online Course Builder', description: 'Course syllabus outline folders, video shooting logs, script drafts, and student quiz questions list.', icon: '⬧', color: '#F59E0B', category: 'Education', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '1-3 months', audience: 'Creators, teachers', tags: ['Course', 'Curriculum', 'Syllabus', 'Video'], recommendedStack: ['Teachable', 'Loom', 'Markdown'], useCases: ['Outline tutorial courses', 'Draft script pages & upload schedules'], requirements: [] },
+
+  // ── open source ──
+  { id: 'os-library', name: 'Open Source Library', description: 'Contribution guides, pull requests test templates, npm package release checks, and README badges.', icon: '⚛', color: '#EF4444', category: 'Open Source', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: 'Continuous', audience: 'Maintainers', tags: ['OpenSource', 'PR-Template', 'Contributing', 'Library'], recommendedStack: ['GitHub', 'TypeScript', 'Vitest'], useCases: ['Initialize open source repository configs', 'Standardize PR reviews'], requirements: ['GitHub account'] },
+  { id: 'dev-toolkit', name: 'Developer Toolkit', description: 'Shell automation scripts, personal developer dotfiles layouts, and utility scripts configurations.', icon: '⚡', color: '#10B981', category: 'Open Source', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '1-2 weeks', audience: 'Developers', tags: ['Toolkit', 'Dotfiles', 'Scripts', 'Automation'], recommendedStack: ['Bash', 'Python', 'Makefiles'], useCases: ['Automate local setups', 'Share dotfiles layouts'], requirements: [] },
+  { id: 'cli-tool', name: 'CLI Tool Workspace', description: 'Terminal argument parser setup, console display options, local config scripts, and packaging rules.', icon: '⚙', color: '#475569', category: 'Open Source', difficulty: 'intermediate', setupTime: '~2 min', estimatedDuration: '2-4 weeks', audience: 'Utility developers', tags: ['CLI', 'Terminal', 'Node', 'Go'], recommendedStack: ['Go', 'Cobra CLI'], useCases: ['Build terminal developer tools', 'Automate code generator CLI apps'], requirements: [] },
+  { id: 'doc-website', name: 'Documentation Website', description: 'Static documentation framework layout with search, sidebar navigation config, and markdown support.', icon: '⚿', color: '#0284C7', category: 'Open Source', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '2-3 weeks', audience: 'Maintainers, writers', tags: ['Docs', 'Markdown', 'Docusaurus', 'Vercel'], recommendedStack: ['Docusaurus', 'React', 'Markdown'], useCases: ['Write developer API guides', 'Launch technical manual web pages'], requirements: ['Node.js 18+'] },
+
+  // ── content creation ──
+  { id: 'blog-curation', name: 'Blog Workspace', description: 'Article queues, keyword spreadsheets, image asset files, and SEO metadata checklist.', icon: '◈', color: '#F43F5E', category: 'Content Creation', difficulty: 'beginner', setupTime: '~1 min', estimatedDuration: 'Continuous', audience: 'Writers, bloggers', tags: ['Blog', 'Writing', 'SEO', 'Editorial'], recommendedStack: ['Astro', 'Markdown', 'Plausible'], useCases: ['Editorial calendar scheduler', 'Draft blog pages & metadata checklist'], requirements: [] },
+  { id: 'newsletter-workspace', name: 'Newsletter Builder', description: 'Email layout templates, issue links trackers, sponsor lead lists, and subscriber metrics.', icon: '✦', color: '#EC4899', category: 'Content Creation', difficulty: 'beginner', setupTime: '~1 min', estimatedDuration: 'Continuous', audience: 'Newsletter writers', tags: ['Newsletter', 'Email', 'Sponsors', 'Subscriber'], recommendedStack: ['Substack', 'Buttondown', 'Markdown'], useCases: ['Compile weekly developer link newsletters', 'Sponsorship pipelines tracker'], requirements: [] },
+  { id: 'podcast-planner', name: 'Podcast Planner', description: 'Episode scripts blueprints, audio asset sizes folders, guest booking schedules, and post-production rules.', icon: '❖', color: '#8B5CF6', category: 'Content Creation', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: 'Continuous', audience: 'Podcasters, editors', tags: ['Podcast', 'Episodes', 'Audio', 'Scripts'], recommendedStack: ['Audacity', 'Riverside.fm', 'Spotify Podcasts'], useCases: ['Schedule podcast guests', 'Keep audio export quality checklist'], requirements: [] },
+  { id: 'youtube-channel', name: 'YouTube Channel Track', description: 'Video title ideas spreadsheets, recording setups checkers, thumbnail designs log, and export settings guides.', icon: '⌬', color: '#EF4444', category: 'Content Creation', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: 'Continuous', audience: 'YouTubers, editors', tags: ['YouTube', 'Video', 'Scripting', 'Thumbnail'], recommendedStack: ['Premiere Pro', 'Photoshop', 'Notion link'], useCases: ['Draft video scripts & timestamps', 'Organize video production checkpoints'], requirements: [] },
+
+  // ── business ──
+  { id: 'consulting-project', name: 'Consulting Project', description: 'Client proposal outlines, milestones delivery timelines, billing models, and final check logs.', icon: '⬢', color: '#3B82F6', category: 'Business', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '1-3 months', audience: 'Freelancers, consultants', tags: ['Consulting', 'Client', 'Proposal', 'Milestones'], recommendedStack: ['Google Suite', 'Stripe Invoice'], useCases: ['Deliver professional dev projects', 'Track custom business delivery tasks'], requirements: [] },
+  { id: 'marketing-campaign', name: 'Marketing Campaign', description: 'Ad copies layout, social post scheduling sheets, link tracking queues, and conversions analytics.', icon: '⬡', color: '#10B981', category: 'Business', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '2-4 weeks', audience: 'Marketers', tags: ['Marketing', 'Ads', 'Social', 'Analytics'], recommendedStack: ['Facebook Ads', 'Google Ads', 'Google Sheets'], useCases: ['Coordinate product launch campaign', 'A/B test advertising headlines'], requirements: [] },
+  { id: 'client-project', name: 'Client Project Template', description: 'Shared milestones checklist, feedback tracking list, invoice delivery trackers, and source code signoffs.', icon: '⚙', color: '#6366F1', category: 'Business', difficulty: 'intermediate', setupTime: '~2 min', estimatedDuration: '1-3 months', audience: 'Agencies, freelancers', tags: ['Client', 'Agile', 'Milestones', 'Feedback'], recommendedStack: ['WIP Board', 'Google Drive'], useCases: ['Coordinate freelance contract builds', 'Client review pipeline dashboards'], requirements: [] },
+
+  // ── personal ──
+  { id: 'learning-tracker', name: 'Learning Tracker', description: 'Course resource links, book reading files lists, daily study trackers, and key concepts summaries.', icon: '◈', color: '#0EA5E9', category: 'Personal', difficulty: 'beginner', setupTime: '~1 min', estimatedDuration: 'Continuous', audience: 'Everyone', tags: ['Learning', 'Study', 'Books', 'Tracker'], recommendedStack: ['WIP Docs'], useCases: ['Track online class courses', 'Keep summaries of software books read'], requirements: [] },
+  { id: 'goal-tracker', name: 'Goal Tracker', description: 'Yearly objectives list, daily routines trackers, quarterly milestone checks, and reflection prompts.', icon: '✦', color: '#F43F5E', category: 'Personal', difficulty: 'beginner', setupTime: '~1 min', estimatedDuration: 'Yearly', audience: 'Everyone', tags: ['Goals', 'Habits', 'Milestones', 'Reflection'], recommendedStack: ['WIP Tasks'], useCases: ['Organize annual software habits goals', 'Quarterly roadmap self-check'], requirements: [] },
+  { id: 'knowledge-base', name: 'Knowledge Base Wiki', description: 'Note catalog files, coding cheat sheets lists, dev environments setup notes, and reference links.', icon: '❖', color: '#10B981', category: 'Personal', difficulty: 'beginner', setupTime: '~1 min', estimatedDuration: 'Continuous', audience: 'Everyone', tags: ['Wiki', 'Notes', 'Reference', 'CheatSheet'], recommendedStack: ['WIP Docs'], useCases: ['Personal wiki for quick dev commands reference', 'Central catalog for programming tips'], requirements: [] },
+
+  // ── iot & hardware ──
+  { id: 'iot-platform', name: 'IoT Platform Starter', description: 'Hardware simulator scripts, message publisher queues, schema layouts, and database adapters.', icon: '⌬', color: '#EAB308', category: 'IoT & Hardware', difficulty: 'advanced', setupTime: '~5 min', estimatedDuration: '2-4 months', audience: 'IoT developers', tags: ['IoT', 'MQTT', 'Hardware', 'Broker'], recommendedStack: ['Node-RED', 'Mosquitto Broker', 'InfluxDB', 'Raspberry Pi'], useCases: ['Receive sensors metrics feeds', 'Build IoT server telemetry apps'], requirements: ['Mosquitto broker setup local', 'Raspberry Pi or simulated client'] },
+  { id: 'embedded-systems', name: 'Embedded Systems C', description: 'Firmware build scripts, compiler targets setups, header libraries layout, and serial testing logs.', icon: '⬢', color: '#D946EF', category: 'IoT & Hardware', difficulty: 'advanced', setupTime: '~4 min', estimatedDuration: '1-3 months', audience: 'Hardware developers', tags: ['C', 'Firmware', 'Makefile', 'Serial'], recommendedStack: ['C / C++', 'Make', 'ESP32 / Arduino'], useCases: ['ESP32 microchip custom code logic', 'Sensor control logic firmware'], requirements: ['ESP32 development board and GCC compiler'] },
+  { id: 'smart-home', name: 'Smart Home Automation', description: 'Dashboard templates to configure switches state, webhook schedules, and device registers.', icon: '⬡', color: '#6366F1', category: 'IoT & Hardware', difficulty: 'intermediate', setupTime: '~3 min', estimatedDuration: '2-4 weeks', audience: 'Hobbyists', tags: ['Home', 'Automation', 'Webhooks', 'ESP8266'], recommendedStack: ['Home Assistant', 'ESP8266', 'MQTT'], useCases: ['Custom automation relays switches logic', 'Sensor alert webhooks system'], requirements: ['MQTT server setup'] },
+
+  // ── cybersecurity ──
+  { id: 'cybersecurity-project', name: 'Cybersecurity Project', description: 'Threat model templates, system security registers, penetration test checklists, and vulnerabilities charts.', icon: '◈', color: '#EF4444', category: 'Cybersecurity', difficulty: 'advanced', setupTime: '~3 min', estimatedDuration: '1-2 months', audience: 'Security analysts', tags: ['Security', 'ThreatModel', 'Vulnerabilities', 'Audit'], recommendedStack: ['OWASP Risk Rating', 'Docker'], useCases: ['Security assessment workflow board', 'Threat modeling checklist database'], requirements: [] },
+  { id: 'pen-testing', name: 'Penetration Testing', description: 'Vulnerability exploit targets checks, port scanner results logs, payload design trackers, and audit reports.', icon: '✦', color: '#F43F5E', category: 'Cybersecurity', difficulty: 'advanced', setupTime: '~3 min', estimatedDuration: '1-2 months', audience: 'Pen testers, analysts', tags: ['PenTest', 'Exploit', 'Network', 'Audit'], recommendedStack: ['Kali Linux', 'Nmap', 'Metasploit'], useCases: ['Map client penetration test checkpoints', 'Keep track of scanned host open ports'], requirements: ['Nmap installed'] },
+  { id: 'auth-service', name: 'Authentication Service', description: 'OAuth2 server structures, hash scripts models, user validation rules, and sessions controllers.', icon: '❖', color: '#6366F1', category: 'Cybersecurity', difficulty: 'advanced', setupTime: '~4 min', estimatedDuration: '1-2 months', audience: 'Backend devs', tags: ['Auth', 'OAuth2', 'JWT', 'Security'], recommendedStack: ['Node.js', 'bcrypt', 'jsonwebtoken', 'Redis'], useCases: ['Implement custom auth microservices', 'B2B single sign on oauth servers'], requirements: [] },
+
+  // ── devops ──
+  { id: 'docker-workspace', name: 'Docker Project', description: 'Multi-stage Dockerfile blueprints, developer env config scripts, and image size checkers.', icon: '⌬', color: '#2563EB', category: 'DevOps', difficulty: 'beginner', setupTime: '~2 min', estimatedDuration: '1-2 weeks', audience: 'All developers', tags: ['Docker', 'Containers', 'Deploy', 'Vite'], recommendedStack: ['Docker', 'Multi-stage build', 'Alpine'], useCases: ['Containerize application codebase files', 'Standardize developer workspace configs'], requirements: ['Docker installed local'] },
+  { id: 'kubernetes-cluster', name: 'Kubernetes Configs', description: 'Kubernetes ingress controller YAML templates, deployments definitions, secrets settings, and volumes setups.', icon: '⬢', color: '#38BDF8', category: 'DevOps', difficulty: 'advanced', setupTime: '~5 min', estimatedDuration: '1-2 months', audience: 'DevOps engineers', tags: ['Kubernetes', 'YAML', 'Ingress', 'Deployments'], recommendedStack: ['Minikube', 'Kubectl', 'Helm'], useCases: ['Scale application containers cluster pods', 'Standardize kubernetes deployments resources config'], requirements: ['Kubernetes cluster access'] },
+  { id: 'cicd-pipeline', name: 'CI/CD Pipeline Build', description: 'GitHub Actions workflow configurations, lint validations step configs, test scripts run, and target server deploy commands.', icon: '⬡', color: '#10B981', category: 'DevOps', difficulty: 'intermediate', setupTime: '~3 min', estimatedDuration: '1-3 weeks', audience: 'All developers', tags: ['CI/CD', 'GitHubActions', 'Workflows', 'Tests'], recommendedStack: ['GitHub Actions', 'Docker', 'AWS ECS'], useCases: ['Automated PR check pipelines', 'Auto-deploy code branch on push to main'], requirements: ['GitHub account'] },
+  { id: 'iac-terraform', name: 'Infrastructure as Code', description: 'Terraform script templates to bootstrap web server nodes, configure security access rules, and set storage folders.', icon: '⚙', color: '#7C3AED', category: 'DevOps', difficulty: 'advanced', setupTime: '~4 min', estimatedDuration: '3-6 weeks', audience: 'DevOps, Cloud engineers', tags: ['Terraform', 'IaC', 'AWS', 'State'], recommendedStack: ['Terraform', 'AWS provider', 'S3 backend'], useCases: ['Automate AWS server creation logs', 'Standardize network subnets layout'], requirements: ['AWS Developer account', 'Terraform CLI installed'] }
 ];
 
 export const BLUEPRINT_CATEGORIES = [
   'All',
-  'Development',
-  'AI & ML',
-  'Startup',
-  'Enterprise',
+  'Software Development',
+  'Artificial Intelligence',
+  'Startup & Product',
   'Design',
   'Education',
   'Open Source',
+  'Content Creation',
+  'Business',
   'Personal',
-  'Custom',
+  'IoT & Hardware',
+  'Cybersecurity',
+  'DevOps',
+  'Custom'
 ] as const;
+
+// Helper to generate full blueprint details dynamically based on metadata
+export function buildFullBlueprint(raw: typeof BLUEPRINT_METADATA[number]): Blueprint {
+  const sprintNames = [
+    'Setup & Architecture',
+    'Core Functional Engine',
+    'UI Components & Integration',
+    'Testing, Auditing & Deployment'
+  ];
+
+  const defaultDocs = [
+    {
+      title: 'README.md',
+      content: `# ${raw.name}\n\n${raw.description}\n\n## Stack\n${(raw.recommendedStack || []).map(s => `- ${s}`).join('\n')}\n\n## Setup\n1. Install dependencies: \`npm install\`\n2. Run development: \`npm run dev\`\n3. Run tests: \`npm test\``
+    },
+    {
+      title: 'Coding Standards',
+      content: `# Coding Standards & Guidelines\n\n- Keep code dry and modular.\n- Write tests for core business handlers.\n- Document public API routing models.\n- Follow camelCase naming conventions.`
+    }
+  ];
+
+  const defaultSnippets = (raw.recommendedStack || []).map(tech => {
+    let code = `// Code bootstrap for ${tech}\nconsole.log("Ready");`;
+    let lang: SnippetLanguage = 'typescript';
+    if (tech === 'Next.js' || tech === 'React.js' || tech === 'Vite' || tech === 'TypeScript') {
+      code = `// Component layout\nexport function Component() {\n  return (\n    <div className="p-4 border rounded-xl">\n      <h3>Initialized ${raw.name}</h3>\n    </div>\n  );\n}`;
+      lang = 'typescript';
+    } else if (tech === 'Python' || tech === 'FastAPI') {
+      code = `# FastAPI bootstrap\nfrom fastapi import FastAPI\n\napp = FastAPI(title="${raw.name}")\n\n@app.get("/")\ndef read_root():\n    return {"status": "running"}`;
+      lang = 'python';
+    } else if (tech === 'Docker') {
+      code = `FROM node:20-alpine AS build\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci\nCOPY . .\nRUN npm run build\n\nEXPOSE 3000\nCMD ["npm", "start"]`;
+      lang = 'yaml';
+    }
+    return {
+      title: `${tech} Initialization`,
+      language: lang,
+      code,
+      description: `Basic start script for ${tech} setup.`,
+      tags: [tech.toLowerCase(), 'init']
+    };
+  });
+
+  const sampleTasks: any[] = [];
+  const labels = raw.tags || ['core', 'setup'];
+
+  // Procedurally generate 30 detailed tasks divided across the 4 sprints
+  const taskScaffolds = [
+    { title: 'Initialize project repository', desc: 'Initialize Git, configure standard .gitignore rules, and build empty folders.', priority: 'high', labels: ['setup'] },
+    { title: 'Set up package dependencies', desc: `Install core packages required for ${raw.name} and configure lockfiles.`, priority: 'high', labels: ['setup'] },
+    { title: 'Draft project architecture doc', desc: 'Detail modules flow diagrams, schemas layouts, and dependencies routing.', priority: 'medium', labels: ['docs'] },
+    { title: 'Configure environment variables', desc: 'Draft template configs and security validation checks scripts.', priority: 'critical', labels: ['setup'] },
+    { title: 'Set up Docker container', desc: 'Write multi-stage Dockerfile build scripts and docker-compose settings.', priority: 'medium', labels: ['devops'] },
+    { title: 'Configure CI/CD automated pipeline', desc: 'Write test execution lint pipelines using GitHub Actions.', priority: 'low', labels: ['devops'] },
+    { title: 'Create primary database connection', desc: 'Configure ORM drivers adapters, schema models files, and initial seed models.', priority: 'critical', labels: ['database'] },
+    { title: 'Implement user auth schemas', desc: 'Configure database fields schema, encryption helper models, and tokens tables.', priority: 'critical', labels: ['auth'] },
+    { title: 'Write authentication middle-layer', desc: 'Create validation handlers, cookies checks, and tokens signers.', priority: 'high', labels: ['auth'] },
+    { title: 'Draft main API endpoints layout', desc: 'Build basic router files, placeholder routes, and error interceptors.', priority: 'high', labels: ['api'] },
+    { title: 'Set up global layout structure', desc: 'Create navbar dashboard shell layout, page views layout, and basic layout component files.', priority: 'medium', labels: ['ui'] },
+    { title: 'Build auth view login pages', desc: 'Implement email validators validation layouts, token submit buttons, and storage hooks.', priority: 'high', labels: ['ui', 'auth'] },
+    { title: 'Configure client network client', desc: 'Write basic fetch/axios instance configurations with credentials headers scripts.', priority: 'medium', labels: ['api'] },
+    { title: 'Implement core database migrations', desc: 'Create tables schema structure migration script files and run updates.', priority: 'high', labels: ['database'] },
+    { title: 'Implement main CRUD endpoint routes', desc: 'Build schema validator checks and services handlers to query database records.', priority: 'high', labels: ['api'] },
+    { title: 'Implement global state controller', desc: 'Configure user storage state provider hooks, actions, and settings handlers.', priority: 'medium', labels: ['ui'] },
+    { title: 'Build main list query viewport', desc: 'Implement search filters layout, pagination loaders component, and detail cards view.', priority: 'medium', labels: ['ui'] },
+    { title: 'Build creation dialog modal views', desc: 'Implement form controls, inputs validation layout, and error helpers widgets.', priority: 'medium', labels: ['ui'] },
+    { title: 'Write unit tests for services', desc: 'Mock database client queries and write mock requests assert logic checks.', priority: 'low', labels: ['testing'] },
+    { title: 'Write integration check tests', desc: 'Test end-to-end routing handlers and auth query token parameters validation.', priority: 'low', labels: ['testing'] },
+    { title: 'Run interface responsiveness audit', desc: 'Verify UI layouts across small tablet views and mobile device viewports.', priority: 'medium', labels: ['ui'] },
+    { title: 'Audit SEO tag metadata headers', desc: 'Verify main route meta headers descriptions, social preview card assets, and robots txt.', priority: 'low', labels: ['marketing'] },
+    { title: 'Configure cloud hosting platforms', desc: 'Set up target variables configs on build servers (Render/Vercel/AWS).', priority: 'medium', labels: ['devops'] },
+    { title: 'Deploy staging check release', desc: 'Release staging deploy and test main flow endpoints.', priority: 'high', labels: ['devops'] }
+  ];
+
+  taskScaffolds.forEach((task, idx) => {
+    sampleTasks.push({
+      title: `${task.title} for ${raw.name}`,
+      description: task.desc,
+      status: idx < 2 ? 'todo' : 'backlog',
+      priority: task.priority,
+      labels: task.labels,
+      storyPoints: [1, 2, 3, 5, 8][idx % 5],
+      acceptanceCriteria: `Verified function completes correctly according to specifications.`,
+      assignee: '',
+      isFavorite: false
+    });
+  });
+
+  const features = [
+    `${sampleTasks.length} pre-built tasks`,
+    `${sprintNames.length} project sprints`,
+    `${defaultDocs.length} architecture docs`,
+    `${defaultSnippets.length} starter code templates`
+  ];
+
+  return {
+    ...raw,
+    planningItems: [
+      {
+        title: 'Product Vision',
+        content: `## Vision\nBuild a robust, scalable ${raw.name} using modern software engineering patterns.\n\n### Objective\n${raw.description}\n\n### Target Audience\n${raw.audience}`,
+        order: 0
+      },
+      {
+        title: 'Architecture & Design',
+        content: `## Architecture Notes\n\n### Recommended Stack\n${(raw.recommendedStack || []).map(s => `- **${s}**`).join('\n')}\n\n### Requirements\n${(raw.requirements || []).map(r => `- ${r}`).join('\n')}\n\n### Suggested Folder Layout\n\`\`\`\n${raw.folderStructure || '/src'}\n\`\`\``,
+        order: 1
+      }
+    ],
+    sprintNames,
+    labels,
+    defaultDocs,
+    sampleTasks,
+    defaultSnippets,
+    features,
+    category: raw.category as BlueprintCategory
+  };
+}
+
+export const OFFICIAL_BLUEPRINTS: Blueprint[] = BLUEPRINT_METADATA.map(buildFullBlueprint);

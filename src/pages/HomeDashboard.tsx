@@ -330,7 +330,7 @@ export function HomeDashboard({ onCreateProject }: HomeDashboardProps) {
               </div>
               {activeProjects.length === 0 ? (
                 <EmptyState
-                  icon="📦"
+                  icon={<FolderOpen className="text-content-muted" size={24} />}
                   title="No active projects"
                   description="Create a project to start tracking your work."
                   action={<button onClick={onCreateProject} className="btn-yellow">Create Project</button>}

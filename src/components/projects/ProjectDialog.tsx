@@ -14,6 +14,7 @@ import type { Project, Blueprint, SnippetLanguage } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { addDays, format } from 'date-fns';
 import { BlueprintSelector } from './BlueprintSelector';
+import { BlueprintStorage } from '@/storage/BlueprintStorage';
 
 interface ProjectDialogProps {
   open: boolean;
@@ -31,7 +32,7 @@ export function ProjectDialog({ open, project, onClose, onSave }: ProjectDialogP
   const [name, setName] = useState(project?.name || '');
   const [description, setDescription] = useState(project?.description || '');
   const [color, setColor] = useState(project?.color || PROJECT_COLORS[0]);
-  const [icon, setIcon] = useState(project?.icon || '📦');
+  const [icon, setIcon] = useState(project?.icon || '◈');
   const [saving, setSaving] = useState(false);
 
   if (!open) return null;
@@ -119,6 +120,7 @@ export function ProjectDialog({ open, project, onClose, onSave }: ProjectDialogP
       if (sprints.length > 0) {
         ActivityStorage.log('sprint_created', 'Sprints created from blueprint', `${sprints.length} sprints created`, newProject.id);
       }
+      BlueprintStorage.recordUsed(bp.id);
     }
 
     setSaving(false);
@@ -132,7 +134,7 @@ export function ProjectDialog({ open, project, onClose, onSave }: ProjectDialogP
     setName('');
     setDescription('');
     setColor(PROJECT_COLORS[0]);
-    setIcon('📦');
+    setIcon('◈');
     onClose();
   };
 

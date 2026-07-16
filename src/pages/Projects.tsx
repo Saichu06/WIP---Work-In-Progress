@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Grid3X3, List, Star, Archive, Search, Filter } from 'lucide-react';
+import { Plus, Grid3X3, List, Star, Archive, Search, Filter, FolderOpen } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { ProjectStorage } from '@/storage/ProjectStorage';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -70,7 +70,7 @@ export function Projects() {
 
         {filtered.length === 0 ? (
           <EmptyState
-            icon="📦"
+            icon={<FolderOpen className="text-content-muted" size={24} />}
             title={search ? `No projects match "${search}"` : "Nothing in Progress"}
             description={search ? "Try a different search term." : "Every great product starts as an idea. Create your first project and start building."}
             action={!search ? <button onClick={() => setCreateOpen(true)} className="btn-yellow">Start Building</button> : undefined}

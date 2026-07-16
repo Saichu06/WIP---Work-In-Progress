@@ -307,14 +307,18 @@ export interface SearchResult {
 }
 
 export type BlueprintCategory =
-  | 'Development'
-  | 'AI & ML'
-  | 'Startup'
-  | 'Enterprise'
+  | 'Software Development'
+  | 'Artificial Intelligence'
+  | 'Startup & Product'
   | 'Design'
   | 'Education'
-  | 'Personal'
   | 'Open Source'
+  | 'Content Creation'
+  | 'Business'
+  | 'Personal'
+  | 'IoT & Hardware'
+  | 'Cybersecurity'
+  | 'DevOps'
   | 'Custom';
 
 export interface Blueprint extends ProjectTemplate {
@@ -325,4 +329,19 @@ export interface Blueprint extends ProjectTemplate {
   defaultSnippets?: { title: string; language: string; code: string; description: string; tags: string[] }[];
   isCustom?: boolean;
   createdAt?: string;
+  // Expanded metadata
+  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  estimatedDuration?: string; // e.g. "1-3 months"
+  tags?: string[];
+  recommendedStack?: string[];
+  useCases?: string[];
+  requirements?: string[];
+  folderStructure?: string;
+  featured?: boolean;
+  official?: boolean;
+  generatedTasks?: number;
+  generatedSprints?: number;
+  generatedDocs?: number;
+  generatedAssets?: number;
+  generatedSnippets?: number;
 }

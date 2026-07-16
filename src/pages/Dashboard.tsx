@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, TrendingUp, CheckSquare, Zap, Star, ArrowRight, Clock } from 'lucide-react';
+import { Plus, TrendingUp, CheckSquare, Zap, Star, ArrowRight, Clock, FolderOpen } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 import { ActivityStorage } from '@/storage/ActivityStorage';
 import { TaskStorage } from '@/storage/TaskStorage';
@@ -108,7 +108,7 @@ export function Dashboard({ onCreateProject }: DashboardProps) {
               </div>
               {activeProjects.length === 0 ? (
                 <EmptyState
-                  icon="📦"
+                  icon={<FolderOpen className="text-content-muted" size={24} />}
                   title="No active projects"
                   description="Create a project to start tracking tasks and sprints."
                   action={<button onClick={onCreateProject} className="btn-yellow">Create Project</button>}

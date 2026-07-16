@@ -1,6 +1,6 @@
 import React from 'react';
 import { TaskActivityLog } from '@/types';
-import { Clock, Plus, RefreshCw, MessageSquare, Upload, CheckSquare, ShieldAlert } from 'lucide-react';
+import { Clock, Plus, RefreshCw, MessageSquare, Upload, CheckSquare, ShieldAlert, Trash2 } from 'lucide-react';
 import { parseISO } from 'date-fns';
 
 interface TaskActivityProps {
@@ -31,7 +31,7 @@ const ACTIVITY_ICONS: Record<string, React.ReactNode> = {
 
 function TrashIcon() {
   return (
-    <span className="text-[10px] leading-none text-red-500">🗑️</span>
+    <Trash2 size={12} className="text-red-500" />
   );
 }
 

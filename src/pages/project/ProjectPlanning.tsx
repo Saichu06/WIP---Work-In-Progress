@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Plus, Save, Edit3, Trash2, ChevronDown, ChevronRight, Eye } from 'lucide-react';
+import { Plus, Save, Edit3, Trash2, ChevronDown, ChevronRight, Eye, Map } from 'lucide-react';
 import { PlanningStorage } from '@/storage/PlanningStorage';
 import { ActivityStorage } from '@/storage/ActivityStorage';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -86,7 +86,7 @@ export function ProjectPlanning() {
 
         {sections.length === 0 ? (
           <EmptyState
-            icon="🗺️"
+            icon={<Map className="text-content-muted" size={24} />}
             title="No planning notes yet"
             description="Every great product starts with a plan. Add your vision, goals, and architecture notes."
             action={<button onClick={addSection} className="btn-yellow">Start Planning</button>}

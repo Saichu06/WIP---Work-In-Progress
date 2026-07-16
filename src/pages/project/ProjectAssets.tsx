@@ -211,13 +211,13 @@ export function ProjectAssets() {
 
           {assets.length === 0 ? (
             <EmptyState
-              icon="🖼️"
+              icon={<HardDrive className="text-content-muted" size={24} />}
               title="No assets uploaded"
               description="Keep your plans, logos, design drafts, and zip releases in a single secure area."
               action={<button onClick={() => fileInputRef.current?.click()} className="btn-yellow">Upload Asset</button>}
             />
           ) : filtered.length === 0 ? (
-            <EmptyState icon="🔍" title="No assets found" description="Try a different search query." />
+            <EmptyState icon={<Search className="text-content-muted" size={24} />} title="No assets found" description="Try a different search query." />
           ) : (
             <div className="space-y-6">
               {/* Pinned Section */}
