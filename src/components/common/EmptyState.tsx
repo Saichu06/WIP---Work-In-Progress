@@ -8,6 +8,7 @@ interface EmptyStateProps {
   action?: ReactNode;
   className?: string;
 }
+//i have added a comment here for github streak
 
 export function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
   return (
